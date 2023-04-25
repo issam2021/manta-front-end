@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import { useTxStatus } from 'contexts/txStatusContext';
 import TxStatus from 'types/TxStatus';
 import extrinsicWasSentByUser from 'utils/api/ExtrinsicWasSendByUser';
@@ -17,7 +17,7 @@ export const BridgeTxContextProvider = (props) => {
   const config = useConfig();
   const { provider } = useMetamask();
   const { setTxStatus, txStatusRef } = useTxStatus();
-  const { externalAccount, externalAccountSigner, setApiSigner } = useExternalAccount();
+  const { externalAccount, externalAccountSigner, setApiSigner } = usePublicAccount();
   const {
     isApiInitialized,
     isApiDisconnected,

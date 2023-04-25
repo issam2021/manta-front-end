@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import DotLoader from 'components/Loaders/DotLoader';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import { formatHoursMinutes } from 'utils/time/timeString';
 import { useConfig } from 'contexts/configContext';
 import { useStakeData } from './StakeContext/StakeDataContext';
@@ -16,7 +16,7 @@ const AccountDisplay = () => {
     secondsSinceReward
   } = useStakeData();
 
-  const { externalAccount } = useExternalAccount();
+  const { externalAccount } = usePublicAccount();
 
   const getBalanceDisplayString = (balance) => {
     if (!externalAccount) {

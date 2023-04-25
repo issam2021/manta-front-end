@@ -1,25 +1,39 @@
 // @ts-nocheck
+import WALLET_NAME from 'constants/WalletConstants';
+import React from 'react';
 import classNames from 'classnames';
 import Icon from 'components/Icon';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import { useKeyring } from 'contexts/keyringContext';
 import { useMetamask } from 'contexts/metamaskContext';
 import { useTxStatus } from 'contexts/txStatusContext';
 import { getSubstrateWallets } from 'utils';
 import { setLastAccessedWallet } from 'utils/persistence/walletStorage';
+import { useGlobal } from 'contexts/globalContexts';
 
 const SubstrateWallets = ({ isMetamaskSelected, setIsMetamaskSelected }) => {
-  const { changeExternalAccountOptions } = useExternalAccount();
+  const { changeExternalAccountOptions } = usePublicAccount();
   const { txStatus } = useTxStatus();
   const disabled = txStatus?.isProcessing();
+  const { usingMantaWallet } = useGlobal();
   const {
     refreshWalletAccounts,
     getLatestAccountAndPairs,
     selectedWallet,
+    authedWalletList,
     keyringIsBusy
   } = useKeyring();
   const substrateWallets = getSubstrateWallets();
-  const enabledExtentions = substrateWallets.filter((wallet) => wallet.extension);
+  let enabledExtentions = substrateWallets.filter((wallet) =>
+    authedWalletList.includes(wallet.extensionName)
+  );
+  if (!usingMantaWallet) {
+    enabledExtentions = enabledExtentions.filter(
+      (wallet) =>
+        wallet.extensionName !== WALLET_NAME.MANTA &&
+        authedWalletList.includes(wallet.extensionName)
+    );
+  }
   const onClickWalletIconHandler = (wallet) => async () => {
     if (keyringIsBusy.current === false && !disabled) {
       await refreshWalletAccounts(wallet);

@@ -5,5 +5,7 @@ export const localStorageKeys = {
   IsPrivateReceiver: 'is-private-receiver',
   IsPrivateSender: 'is-private-sender',
   BridgeOriginChainName: 'bridge-origin-chain',
-  BridgeDestinationChainName: 'bridge-destination-chain'
+  BridgeDestinationChainName: 'bridge-destination-chain',
+  SkipMantaWalletIntro: 'skip-manta-wallet-intro',
+  UsingMantaWallet: 'using-manta-wallet'
 };

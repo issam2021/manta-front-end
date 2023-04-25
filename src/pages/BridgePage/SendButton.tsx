@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { useTxStatus } from 'contexts/txStatusContext';
 import MantaLoading from 'components/Loading';
 import { ConnectWalletButton } from 'components/Accounts/ConnectWallet';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import { useMetamask } from 'contexts/metamaskContext';
 import { API_STATE, useSubstrate } from 'contexts/substrateContext';
 import Chain from 'types/Chain';
@@ -15,7 +15,7 @@ import { useBridgeData } from './BridgeContext/BridgeDataContext';
 const ValidationButton = () => {
   const config = useConfig();
   const { apiState } = useSubstrate();
-  const { externalAccount } = useExternalAccount();
+  const { externalAccount } = usePublicAccount();
   const {
     senderAssetType,
     minInput,

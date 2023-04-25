@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import { BN } from 'bn.js';
 import Balance from 'types/Balance';
 import AssetType from 'types/AssetType';
-import { useExternalAccount } from './externalAccountContext';
+import { usePublicAccount } from './publicAccountContext';
 import { useSubstrate } from './substrateContext';
 
 interface IPublicBalances {
@@ -20,7 +20,7 @@ const PublicBalancesContext = createContext();
 
 export const PublicBalancesContextProvider = (props) => {
   const { api } = useSubstrate();
-  const { externalAccount } = useExternalAccount();
+  const { externalAccount } = usePublicAccount();
 
   const [publicBalances, setPublicBalances] = useState<
     IPublicBalances | undefined

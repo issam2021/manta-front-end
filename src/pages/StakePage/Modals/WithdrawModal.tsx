@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from 'components/Button';
 import ErrorText from 'components/Error/ErrorText';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import { useTxStatus } from 'contexts/txStatusContext';
 import { useStakeData } from '../StakeContext/StakeDataContext';
 import { useStakeTx } from '../StakeContext/StakeTxContext';
@@ -11,7 +11,7 @@ import ModalNotes from './ModalNotes';
 export const WithdrawModal = ({hideModal}) => {
   const { selectedUnstakeRequest, userAvailableBalance } = useStakeData();
   const { getUserCanWithdraw, getUserHasSufficientFundsToWithdraw, withdraw } = useStakeTx();
-  const { externalAccount } = useExternalAccount();
+  const { externalAccount } = usePublicAccount();
   const { txStatus } = useTxStatus();
 
   const [errorMessage, setErrorMessage] = useState(null);

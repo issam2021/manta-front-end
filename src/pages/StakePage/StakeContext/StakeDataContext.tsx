@@ -6,7 +6,7 @@ import { useReducer } from 'react';
 import { useSubstrate } from 'contexts/substrateContext';
 import Delegation from 'types/Delegation';
 import Collator from 'types/Collator';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import Balance from 'types/Balance';
 import AssetType from 'types/AssetType';
 import BN from 'bn.js';
@@ -33,7 +33,7 @@ export const StakeDataContextProvider = (props) => {
   const config = useConfig();
   const { api } = useSubstrate();
   const { txStatus, txStatusRef } = useTxStatus();
-  const { externalAccount } = useExternalAccount();
+  const { externalAccount } = usePublicAccount();
   const address =  externalAccount?.address;
   const initState = { ...STAKE_INIT_STATE };
   const [state, dispatch] = useReducer(stakeReducer, initState);

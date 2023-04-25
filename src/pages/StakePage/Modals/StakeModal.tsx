@@ -7,7 +7,7 @@ import Decimal from 'decimal.js';
 import BN from 'bn.js';
 import Balance from 'types/Balance';
 import ErrorText from 'components/Error/ErrorText';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import { useTxStatus } from 'contexts/txStatusContext';
 import { useConfig } from 'contexts/configContext';
 import DotLoader from 'components/Loaders/DotLoader';
@@ -38,7 +38,7 @@ export const StakeModal = ({ hideModal }) => {
 
   const config = useConfig();
   const { txStatus } = useTxStatus();
-  const { externalAccount } = useExternalAccount();
+  const { externalAccount } = usePublicAccount();
   const { usdPrices } = useUsdPrices();
   const nativeTokenUsdValue = usdPrices?.[AssetType.Native(config).baseTicker];
 

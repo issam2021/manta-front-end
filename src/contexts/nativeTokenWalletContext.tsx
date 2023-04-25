@@ -10,7 +10,7 @@ import { BN } from 'bn.js';
 import Balance from 'types/Balance';
 import PropTypes from 'prop-types';
 import { useSubstrate } from './substrateContext';
-import { useExternalAccount } from './externalAccountContext';
+import { usePublicAccount } from './publicAccountContext';
 import { useConfig } from './configContext';
 
 const NativeTokenWalletContext = createContext();
@@ -18,7 +18,7 @@ const NativeTokenWalletContext = createContext();
 export const NativeTokenWalletContextProvider = (props) => {
   const config = useConfig();
   const { api } = useSubstrate();
-  const { externalAccount, externalAccountRef } = useExternalAccount();
+  const { externalAccount, externalAccountRef } = usePublicAccount();
   const [nativeTokenBalance, setNativeTokenBalance] = useState(null);
   const refreshLoopIsActive = useRef(false);
 

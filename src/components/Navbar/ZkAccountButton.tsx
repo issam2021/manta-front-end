@@ -7,7 +7,7 @@ import { useModal } from 'hooks';
 import ConnectSignerModal from 'components/Modal/connectSigner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-import signerIsOutOfDate from 'utils/validation/signerIsOutOfDate';
+import versionIsOutOfDate from 'utils/validation/versionIsOutOfDate';
 import classNames from 'classnames';
 import { API_STATE, useSubstrate } from 'contexts/substrateContext';
 import Icon from 'components/Icon';
@@ -17,7 +17,8 @@ import ZkAccountModal from '../ZkAccount/ZkAccountModal';
 const ZkAccountDisplay = () => {
   const [showZkModal, setShowZkModal] = useState(false);
   const { apiState } = useSubstrate();
-  const isDisconnected = apiState === API_STATE.DISCONNECTED  || apiState === API_STATE.ERROR;
+  const isDisconnected =
+    apiState === API_STATE.DISCONNECTED || apiState === API_STATE.ERROR;
 
   return (
     <div className="relative">
@@ -104,7 +105,7 @@ const ZkAccountButton = () => {
 
   if (privateAddress) {
     return <ZkAccountDisplay />;
-  } else if (signerIsOutOfDate(config, signerVersion)) {
+  } else if (versionIsOutOfDate(config.MIN_REQUIRED_SIGNER_VERSION, signerVersion)) {
     return (
       <ZkAccountWarning
         title={'Manta Signer Out of Date'}

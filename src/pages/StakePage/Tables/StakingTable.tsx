@@ -4,7 +4,7 @@ import { ColDef } from 'ag-grid-community';
 import { useModal } from 'hooks';
 import Button from 'components/Button';
 import SortableTable from 'components/SortableTable';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import Delegation from 'types/Delegation';
 import getTableHeight from 'utils/ui/getTableHeight';
 import { useSubstrate } from 'contexts/substrateContext';
@@ -17,7 +17,7 @@ import StakeErrorDisplay from '../StakeErrorDisplay';
 import CollatorDisplayCell from './CollatorDisplayCell';
 
 const NothingStakedDisplay = () => {
-  const { externalAccount } = useExternalAccount();
+  const { externalAccount } = usePublicAccount();
   let primaryText = '';
   let secondaryText = '';
   if (!externalAccount) {

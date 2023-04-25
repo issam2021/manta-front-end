@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { useTxStatus } from 'contexts/txStatusContext';
 import { ethers } from 'ethers';
 import { useMetamask } from 'contexts/metamaskContext';
-import { useExternalAccount } from 'contexts/externalAccountContext';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import { validatePublicAddress } from 'utils/validation/validateAddress';
 import { useKeyring } from 'contexts/keyringContext';
 import Icon from 'components/Icon';
@@ -21,7 +21,7 @@ const BirdgeDestinationButton = ({onChangeDestinationtInput}) => {
   const disabled = txStatus?.isProcessing();
   const { selectedWallet } = useKeyring();
   const { ethAddress, configureMoonRiver } = useMetamask();
-  const { externalAccount } = useExternalAccount();
+  const { externalAccount } = usePublicAccount();
 
   const onClick = () => {
     if (!ethAddress && destinationChainIsEvm) {

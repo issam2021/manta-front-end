@@ -1,65 +1,113 @@
-// @ts-nocheck
 import APP_NAME from 'constants/AppConstants';
 import { SS58 } from 'constants/NetworkConstants';
-import keyring from '@polkadot/ui-keyring';
-import { getSubstrateWallets } from 'utils';
-import PropTypes from 'prop-types';
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import WALLET_NAME from 'constants/WalletConstants';
+import { KeyringPair } from '@polkadot/keyring/types';
+import keyring, { Keyring } from '@polkadot/ui-keyring';
+import { Wallet } from 'manta-extension-connect';
 import {
-  getHasAuthToConnectWalletStorage,
-  setHasAuthToConnectWalletStorage
+  createContext,
+  MutableRefObject,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
+import { getSubstrateWallets } from 'utils';
+import {
+  getAuthedWalletListStorage,
+  setAuthedWalletListStorage
 } from 'utils/persistence/connectAuthorizationStorage';
 import { getLastAccessedExternalAccount } from 'utils/persistence/externalAccountStorage';
 import {
   getLastAccessedWallet,
   setLastAccessedWallet
 } from 'utils/persistence/walletStorage';
+import isObjectEmpty from 'utils/validation/isEmpty';
+import { useActive } from 'hooks/useActive';
 
-const KeyringContext = createContext();
-const MAX_WAIT_COUNT = 5;
+type KeyringContextValue = {
+  keyring: Keyring;
+  isKeyringInit: boolean;
+  keyringAddresses: string[];
+  selectedWallet: Wallet;
+  keyringIsBusy: MutableRefObject<boolean>;
+  authedWalletList: string[];
+  connectWallet: (
+    extensionName: string,
+    saveToStorage?: boolean,
+    isFromConnectModal?: boolean
+  ) => Promise<boolean | undefined>;
+  connectWalletExtensions: (extensionNames: string[]) => void;
+  refreshWalletAccounts: (wallet: Wallet) => Promise<string | void>;
+  getLatestAccountAndPairs: () => {
+    account: KeyringPair;
+    pairs: KeyringPair[];
+  };
+};
+const KeyringContext = createContext<KeyringContextValue | null>(null);
 
-export const KeyringContextProvider = (props) => {
-  const [waitExtensionCounter, setWaitExtensionCounter] = useState(0);
-  const [isKeyringInit, setIsKeyringInit] = useState(false);
-  const [keyringAddresses, setKeyringAddresses] = useState([]);
-  const [web3ExtensionInjected, setWeb3ExtensionInjected] = useState([]);
-  const [selectedWallet, setSelectedWallet] = useState(null);
-  const [isTalismanExtConfigured, setIsTalismanExtConfigured] = useState(true);
-  const [hasAuthToConnectWallet, setHasAuthToConnectWallet] = useState(
-    getHasAuthToConnectWalletStorage()
+const getInitialWalletConnectingErrorMessages = () => {
+  const errorMessages: { [key: string]: string } = {};
+  Object.values(WALLET_NAME).forEach(
+    (walletName: string) => (errorMessages[walletName] = '')
   );
-  const keyringIsBusy = useRef(false);
+  return errorMessages;
+};
 
-  const addWalletName = (walletName, walletNameList) => {
+export const KeyringContextProvider = ({
+  children
+}: {
+  children: ReactNode;
+}) => {
+  const [isKeyringInit, setIsKeyringInit] = useState(false);
+  const [keyringAddresses, setKeyringAddresses] = useState<string[]>([]);
+  const [web3ExtensionInjected, setWeb3ExtensionInjected] = useState<string[]>(
+    []
+  );
+  const [selectedWallet, setSelectedWallet] = useState<Wallet>(
+    getLastAccessedWallet()
+  );
+  const lastAccessExtensionName = getLastAccessedWallet()?.extensionName;
+  const [authedWalletList, setAuthedWalletList] = useState<string[]>([]);
+  const keyringIsBusy = useRef(false);
+  const isActive = useActive();
+
+  const [walletConnectingErrorMessages, setWalletConnectingErrorMessages] =
+    useState(getInitialWalletConnectingErrorMessages());
+
+  const resetWalletConnectingErrorMessages = useCallback(() => {
+    setWalletConnectingErrorMessages(getInitialWalletConnectingErrorMessages());
+  }, []);
+
+  const addWalletName = (walletName: string, walletNameList: string[]) => {
     const copyWalletNameList = [...walletNameList];
     if (!copyWalletNameList.includes(walletName)) {
       copyWalletNameList.push(walletName);
       return copyWalletNameList;
     }
+    return copyWalletNameList;
   };
 
-  const removeWalletName = (walletName, walletNameList) => {
-    return walletNameList.filter((name) => name !== walletName);
-  };
-
-  const connectWalletExtension = (extensionName) => {
-    const walletNames = addWalletName(extensionName, hasAuthToConnectWallet);
-    setHasAuthToConnectWalletStorage(walletNames);
-    setHasAuthToConnectWallet(walletNames);
-  };
-
-  const refreshWalletAccounts = async (wallet) => {
-    await wallet.enable(APP_NAME);
+  const refreshWalletAccounts = async (wallet: Wallet) => {
+    if (!wallet?.enable) {
+      return Promise.resolve('no enable function');
+    }
     keyringIsBusy.current = true;
     let currentKeyringAddresses = keyring
       .getAccounts()
       .map((account) => account.address);
 
     const originUpdatedAccounts = await wallet.getAccounts();
-    const updatedAccounts = originUpdatedAccounts.filter((a) =>
-      ['ecdsa', 'ed25519', 'sr25519'].includes(a.type)
-    ); // ethereum account address should be avoid in substrate (tailsman)
-    const substrateAddresses = updatedAccounts.map((account) => account.address);
+    const updatedAccounts = originUpdatedAccounts.filter((a) => {
+      // @ts-ignore
+      return ['ecdsa', 'ed25519', 'sr25519'].includes(a.type);
+    }); // ethereum account address should be avoid in substrate (tailsman)
+    const substrateAddresses: string[] = updatedAccounts.map(
+      (account) => account.address
+    );
     currentKeyringAddresses.forEach((address) => {
       keyring.forgetAccount(address);
     });
@@ -70,64 +118,138 @@ export const KeyringContextProvider = (props) => {
 
     if (currentKeyringAddresses.length === 0) {
       updatedAccounts.forEach((account) => {
+        // loadInjected is a privated function, will caused eslint error
+        // @ts-ignore
         keyring.loadInjected(account.address, { ...account }, account.type);
       });
 
+      // to prevent re-render when keyringAddresses not change because re-render will cause other bugs
+      const sameLength = keyringAddresses.length === substrateAddresses.length;
+      const keyringAddressesNotChanged =
+        sameLength &&
+        keyringAddresses.filter((addr) => !substrateAddresses.includes(addr))
+          .length === 0;
       setSelectedWallet(wallet);
-      setKeyringAddresses(substrateAddresses);
+      if (!keyringAddressesNotChanged) {
+        setKeyringAddresses(substrateAddresses);
+      }
     }
 
     keyringIsBusy.current = false;
   };
+
+  const connectWallet = useCallback(
+    async (
+      extensionName: string,
+      saveToStorage = true,
+      isFromConnectModal = false
+    ) => {
+      if (!isKeyringInit) {
+        return false;
+      }
+      if (walletConnectingErrorMessages[extensionName]) {
+        setWalletConnectingErrorMessages({
+          ...walletConnectingErrorMessages,
+          ...{ [extensionName]: '' }
+        });
+      }
+      const substrateWallets = getSubstrateWallets();
+      const selectedWallet = substrateWallets.find(
+        (wallet: any) => wallet.extensionName === extensionName
+      );
+      if (
+        !selectedWallet?.extension ||
+        (extensionName === WALLET_NAME.TALISMAN &&
+          !authedWalletList.includes(extensionName))
+      ) {
+        try {
+          await selectedWallet?.enable(APP_NAME);
+          if (
+            isFromConnectModal &&
+            extensionName === WALLET_NAME.MANTA &&
+            authedWalletList.length > 0
+          ) {
+            return true;
+          }
+          if (selectedWallet) {
+            await refreshWalletAccounts(selectedWallet);
+          }
+          saveToStorage &&
+            selectedWallet &&
+            setLastAccessedWallet(selectedWallet);
+          return true;
+        } catch (e: any) {
+          setWalletConnectingErrorMessages({
+            ...walletConnectingErrorMessages,
+            ...{ [extensionName]: e.message }
+          });
+          // catch both errors for selectedWallet?.enable and refreshWalletAccounts:wallet.getAccounts(e.g. Talisman reject)
+          // if for refreshWalletAccounts:wallet.getAccounts, we need to change keyringIsBusy.current = false
+          if (keyringIsBusy.current) {
+            keyringIsBusy.current = false;
+          }
+          return false;
+        }
+      }
+      return true;
+    },
+    [
+      isKeyringInit,
+      walletConnectingErrorMessages,
+      authedWalletList,
+      refreshWalletAccounts
+    ]
+  );
+
+  const connectWalletExtensions = useCallback(
+    async (extensionNames: string[]) => {
+      let walletNames = [...authedWalletList];
+      for (const extensionName of extensionNames.filter(
+        (name) => name !== lastAccessExtensionName
+      )) {
+        const isConnectedSuccess = await connectWallet(extensionName, false);
+        if (isConnectedSuccess) {
+          walletNames = addWalletName(extensionName, walletNames);
+        }
+      }
+      if (lastAccessExtensionName) {
+        const isConnectedSuccess = await connectWallet(
+          lastAccessExtensionName,
+          true
+        );
+        if (isConnectedSuccess) {
+          walletNames = addWalletName(lastAccessExtensionName, walletNames);
+        }
+      }
+      setAuthedWalletListStorage(walletNames);
+      setAuthedWalletList(walletNames);
+    },
+    [authedWalletList, lastAccessExtensionName, connectWallet]
+  );
 
   const getLatestAccountAndPairs = () => {
     const pairs = keyring.getPairs();
     const {
       meta: { source }
     } = pairs[0] || { meta: {} };
-    const account = getLastAccessedExternalAccount(keyring, source) || pairs[0];
+    const account =
+      getLastAccessedExternalAccount(keyring, source as string) || pairs[0];
     return { account, pairs };
   };
 
   useEffect(() => {
+    // if not adding keyringAddresses as a dep, interval refreshWalletAccounts() is always using old keyringAddresses value
+    const hasSelectedWallet = !isObjectEmpty(selectedWallet);
     const interval = setInterval(async () => {
-      selectedWallet && refreshWalletAccounts(selectedWallet);
+      isActive && hasSelectedWallet && refreshWalletAccounts(selectedWallet);
     }, 1000);
-    return () => interval && clearInterval(interval);
-  }, [selectedWallet]);
+    return () => {
+      interval && clearInterval(interval);
+    };
+  }, [selectedWallet, keyringAddresses]);
 
-  const triggerInitKeyringWhenWeb3ExtensionsInjected = async () => {
-    if (!isKeyringInit) {
-      if (
-        window.injectedWeb3 &&
-        Object.getOwnPropertyNames(window.injectedWeb3).length !== 0
-      ) {
-        setWeb3ExtensionInjected(
-          Object.getOwnPropertyNames(window.injectedWeb3)
-        );
-        setTimeout(async () => {
-          await initKeyring();
-          if (waitExtensionCounter < MAX_WAIT_COUNT) {
-            setWaitExtensionCounter((counter) => counter + 1);
-          }
-        }, 500);
-      } else {
-        setTimeout(async () => {
-          if (waitExtensionCounter < MAX_WAIT_COUNT) {
-            setWaitExtensionCounter((counter) => counter + 1);
-          }
-        }, 500);
-      }
-    }
-  };
-
-  const initKeyring = async () => {
-    const unsubscribe = () => {};
-    if (
-      hasAuthToConnectWallet?.length > 0 &&
-      !isKeyringInit &&
-      web3ExtensionInjected.length !== 0
-    ) {
+  const initKeyring = useCallback(async () => {
+    if (!isKeyringInit && web3ExtensionInjected.length !== 0) {
       const isCalamari = window?.location?.pathname?.includes('calamari');
       keyring.loadAll(
         {
@@ -137,92 +259,77 @@ export const KeyringContextProvider = (props) => {
       );
       setIsKeyringInit(true);
     }
-    return unsubscribe;
-  };
+  }, [isKeyringInit, web3ExtensionInjected.length]);
 
-  useEffect(() => {
-    return initKeyring();
-  }, [hasAuthToConnectWallet]);
-
-  useEffect(() => {
-    triggerInitKeyringWhenWeb3ExtensionsInjected();
-  }, [waitExtensionCounter]);
-
-  const connectWallet = async (extensionName, saveToStorage = true) => {
+  const getWeb3ExtensionInjected = useCallback(async () => {
     if (!isKeyringInit) {
-      return;
-    }
-    const substrateWallets = getSubstrateWallets();
-    const selectedWallet = substrateWallets.find(
-      (wallet) => wallet.extensionName === extensionName
-    );
-    if (!selectedWallet?.extension) {
-      try {
-        if (extensionName.toLowerCase() === 'talisman' && !isTalismanExtConfigured) {
-          // hide tips
-          setIsTalismanExtConfigured(true);
-        }
-        await selectedWallet.enable(APP_NAME);
-        await refreshWalletAccounts(selectedWallet);
-        saveToStorage && setLastAccessedWallet(selectedWallet);
-        return true;
-      } catch (e) {
-        if (e.message === 'Talisman extension has not been configured yet. Please continue with onboarding.') {
-          // show tips
-          setIsTalismanExtConfigured(false);
-        }
-        const walletNames = removeWalletName(
-          extensionName,
-          hasAuthToConnectWallet
+      if (
+        (window as any).injectedWeb3 &&
+        Object.getOwnPropertyNames((window as any).injectedWeb3).length !== 0
+      ) {
+        setWeb3ExtensionInjected(
+          Object.getOwnPropertyNames((window as any).injectedWeb3)
         );
-        setHasAuthToConnectWalletStorage(walletNames);
-        setHasAuthToConnectWallet(walletNames);
-        return false;
       }
     }
-  };
+  }, [isKeyringInit]);
 
+  useEffect(() => {
+    getWeb3ExtensionInjected();
+  }, [getWeb3ExtensionInjected]);
+
+  useEffect(() => {
+    initKeyring();
+  }, [initKeyring]);
+
+  /** Keyring Init Logic */
   useEffect(() => {
     if (!isKeyringInit) {
       return;
     }
-    const withoutLastAccessedWallet = removeWalletName(
-      getLastAccessedWallet()?.extensionName,
-      hasAuthToConnectWallet
-    );
-
-    withoutLastAccessedWallet?.map((walletName) => {
-      connectWallet(walletName, false);
-    });
-
-    setTimeout(() => {
-      connectWallet(getLastAccessedWallet()?.extensionName);
-    }, 200);
+    const prevAuthedWalletList = getAuthedWalletListStorage();
+    if (prevAuthedWalletList.length !== 0) {
+      connectWalletExtensions(prevAuthedWalletList);
+    }
   }, [isKeyringInit]);
 
-  const value = {
-    keyring, // keyring object would not change even if properties changed
-    isKeyringInit,
-    keyringAddresses, //keyring object would not change so use keyringAddresses to trigger re-render
-    web3ExtensionInjected,
-    selectedWallet,
-    keyringIsBusy,
-    connectWallet,
-    connectWalletExtension,
-    refreshWalletAccounts,
-    isTalismanExtConfigured,
-    getLatestAccountAndPairs
-  };
+  const value = useMemo(
+    () => ({
+      keyring, // keyring object would not change even if properties changed
+      isKeyringInit,
+      keyringAddresses, //keyring object would not change so use keyringAddresses to trigger re-render
+      selectedWallet,
+      keyringIsBusy,
+      authedWalletList,
+      walletConnectingErrorMessages,
+      connectWallet,
+      connectWalletExtensions,
+      refreshWalletAccounts,
+      getLatestAccountAndPairs,
+      resetWalletConnectingErrorMessages
+    }),
+    [
+      connectWallet,
+      connectWalletExtensions,
+      isKeyringInit,
+      keyringAddresses,
+      selectedWallet,
+      authedWalletList,
+      walletConnectingErrorMessages
+    ]
+  );
 
   return (
-    <KeyringContext.Provider value={value}>
-      {props.children}
-    </KeyringContext.Provider>
+    <KeyringContext.Provider value={value}>{children}</KeyringContext.Provider>
   );
 };
 
-KeyringContextProvider.propTypes = {
-  children: PropTypes.any
+export const useKeyring = () => {
+  const data = useContext(KeyringContext);
+  if (!data || !Object.keys(data)?.length) {
+    throw new Error(
+      'useKeyring can only be used inside of <KeyringContext />, please declare it at a higher level.'
+    );
+  }
+  return data;
 };
-
-export const useKeyring = () => ({ ...useContext(KeyringContext) });

@@ -17,6 +17,5 @@ Before we can merge this PR, please make sure that all the following items have 
 ## If PR to `main`
 - [ ] Update the version number in `package.json` and `src/config/common.json`
 - [ ] Update the minimum required signer version number in `src/config/common.json` if applicable
-- [ ] Test following the procedure in `docs/manual_test.md`
 - [ ] Update `CHANGELOG.md`
 - [ ] Make sure that all PR's to `manta-signer` and `sdk` on which this PR depends are merged

@@ -8,6 +8,7 @@ import {
   setHasAuthToConnectMetamaskStorage
 } from 'utils/persistence/connectAuthorizationStorage';
 import { useConfig } from './configContext';
+import { useActive } from 'hooks/useActive';
 
 const MetamaskContext = createContext();
 
@@ -19,6 +20,7 @@ export const MetamaskContextProvider = (props) => {
   const [hasAuthConnectMetamask, setHasAuthConnectMetamask] = useState(
     getHasAuthToConnectMetamaskStorage()
   );
+  const isActive = useActive();
 
   const metamaskIsInstalled =
     window.ethereum?.isMetaMask &&
@@ -71,7 +73,7 @@ export const MetamaskContextProvider = (props) => {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      detectMetamask();
+      if(isActive) detectMetamask();
     }, 500);
     return () => clearInterval(interval);
   });

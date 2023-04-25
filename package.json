@@ -1,6 +1,6 @@
 {
     "name": "manta-web-app",
-    "version": "5.1.1",
+    "version": "6.0.0",
     "private": false,
     "dependencies": {
         "@acala-network/api": "^4.1.6-29",
@@ -35,6 +35,7 @@
         "@types/store": "^2.0.2",
         "ag-grid-community": "^28.1.1",
         "ag-grid-react": "^28.1.1",
+        "ahooks": "^3.7.6",
         "axios": "^0.27.2",
         "axios-retry": "^3.3.1",
         "bn.js": "^5.2.0",
@@ -45,6 +46,7 @@
         "ethereum-blockies-base64": "^1.0.2",
         "ethers": "^5.6.9",
         "husky": "^7.0.1",
+        "manta-extension-connect": "^1.2.3",
         "manta-polkawallet-bridge": "0.4.0",
         "manta.js": "3.0.1",
         "moonbeam-types-bundle": "2.0.8",

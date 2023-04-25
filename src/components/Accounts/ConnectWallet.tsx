@@ -6,6 +6,7 @@ import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useTxStatus } from 'contexts/txStatusContext';
 import ConnectWalletModal from 'components/Modal/connectWalletModal';
+import { useKeyring } from 'contexts/keyringContext';
 
 export const ConnectWalletButton = ({
   setIsMetamaskSelected = null,
@@ -27,9 +28,7 @@ export const ConnectWalletButton = ({
   );
 };
 
-export const ConnectWalletIcon = ({
-  setIsMetamaskSelected = null,
-}) => {
+export const ConnectWalletIcon = ({ setIsMetamaskSelected = null }) => {
   const component = (
     <FontAwesomeIcon
       className={'w-6 h-6 px-5 py-4 cursor-pointer z-10 text-secondary'}
@@ -44,21 +43,18 @@ export const ConnectWalletIcon = ({
   );
 };
 
-const ConnectWallet = ({
-  component,
-  setIsMetamaskSelected = null,
-}) => {
-  const { ModalWrapper, showModal, hideModal } = useModal();
+const ConnectWallet = ({ component, setIsMetamaskSelected = null }) => {
+  const { resetWalletConnectingErrorMessages } = useKeyring();
+  const { ModalWrapper, showModal, hideModal } = useModal({
+    closeCallback: () => resetWalletConnectingErrorMessages()
+  });
   const { txStatus } = useTxStatus();
   const disabled = txStatus?.isProcessing();
   const onClick = () => !disabled && showModal();
 
   return (
     <>
-      <div
-        className={classNames({disabled: disabled})}
-        onClick={onClick}
-      >
+      <div className={classNames({ disabled: disabled })} onClick={onClick}>
         {component}
       </div>
       <ModalWrapper>

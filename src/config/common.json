@@ -1,8 +1,9 @@
 {
-    "VERSION": "5.1.1",
+    "VERSION": "6.0.0",
     "DOWNTIME": false,
     "PAGE_TITLE": "Manta dApp",
     "MIN_REQUIRED_SIGNER_VERSION": "1.2.1",
+    "MIN_REQUIRED_WALLET_VERSION": "0.0.3",
     "SIGNER_URL": "http://localhost:29987/",
     "SUBSCAN_API_KEY": "35770f43091fd396d35192f5b6c499db",
     "COINGECKO_PROXY_URL": "https://52rhbkf39l.execute-api.eu-central-1.amazonaws.com/prod",

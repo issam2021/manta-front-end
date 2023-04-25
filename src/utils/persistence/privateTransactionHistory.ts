@@ -70,7 +70,7 @@ export const updateTxHistoryEventStatus = (
 };
 
 // remove pending history event (usually the last one) from the history
-export const removePendingTxHistoryEvent = (extrinsicHash: string) => {
+export const removePendingTxHistoryEvent = (extrinsicHash?: string) => {
   const privateTransactionHistory = [...getPrivateTransactionHistory(null)];
   if (privateTransactionHistory.length === 0) {
     return;

@@ -1,8 +1,8 @@
-import { usePrivateWallet } from 'contexts/privateWalletContext';
 import {
   useZkAccountBalances,
   ZkAccountBalance
 } from 'contexts/zkAccountBalancesContext';
+import { usePrivateWallet } from 'contexts/privateWalletContext';
 import PrivateAssetItem from './PrivateAssetItem';
 
 const PrivateAssetTableContent = () => {

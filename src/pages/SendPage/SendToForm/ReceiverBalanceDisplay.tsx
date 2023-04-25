@@ -9,7 +9,7 @@ const ReceiverBalanceDisplay = () => {
     receiverAssetType,
     senderAssetTargetBalance
   } = useSend();
-  const {balanceText,shouldShowLoader} = useReceiverBalanceText();
+  const { balanceText, shouldShowLoader} = useReceiverBalanceText();
 
   const targetBalanceString = senderAssetTargetBalance
     ? senderAssetTargetBalance.toStringUnrounded()

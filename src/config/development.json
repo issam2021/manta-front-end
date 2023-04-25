@@ -1,5 +1,4 @@
 {
-    "CALAMARI_SOCKET": "wss://ws.calamari.systems",
     "DEV_CONSOLE": true,
     "NODES": [{
             "name": "Calamari",

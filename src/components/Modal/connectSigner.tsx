@@ -4,7 +4,6 @@ import {
   faQuestionCircle,
   faArrowUpRightFromSquare,
   faInfoCircle,
-  faChevronRight
 } from '@fortawesome/free-solid-svg-icons';
 import Icon from 'components/Icon';
 
@@ -16,7 +15,7 @@ const ConnectSignerModal = () => {
       <p className="tracking-tighter mt-4 mb-1 text-white text-opacity-70 text-xss">
         Log in to Manta Signer to see your zkAssets and to start transacting.
       </p>
-      <div className="text-white text-opacity-70 flex flex-row gap-2">
+      <div className="my-3 text-white text-opacity-70 flex flex-row gap-2">
         <FontAwesomeIcon
           className="place-self-center w-3 h-3"
           icon={faInfoCircle}
@@ -25,19 +24,6 @@ const ConnectSignerModal = () => {
           For Brave users: if you are already logged in, lower shields to
           connect.
         </p>
-      </div>
-      <div className="mt-4 my-3">
-        <p className="text-white text-opacity-70 text-xss">
-          Don't have Manta Signer installed?
-        </p>
-        <a
-          href="https://signer.manta.network/"
-          target="_blank"
-          className="my-1 text-white hover:cursor-pointer flex flex-row items-center gap-3 hover:text-green-light"
-          rel="noreferrer">
-          Download Now
-          <FontAwesomeIcon className="w-2.5 h-2.5" icon={faChevronRight} />
-        </a>
       </div>
 
       <a

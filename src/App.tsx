@@ -1,16 +1,15 @@
 // @ts-nocheck
-import React from 'react';
 import AppRouter from 'AppRouter';
-import GlobalContexts from 'contexts/globalContexts';
+import { ThemeProvider } from 'contexts/themeContext';
 
 function App() {
   return (
     <div className="main-app bg-primary">
       <div className="flex flex-col m-auto">
         <div className="min-h-screen">
-          <GlobalContexts>
+          <ThemeProvider>
             <AppRouter />
-          </GlobalContexts>
+          </ThemeProvider>
         </div>
       </div>
     </div>

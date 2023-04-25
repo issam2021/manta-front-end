@@ -220,7 +220,7 @@ const setSenderPublicAccount = (state, action) => {
 };
 
 const setSenderAssetCurrentBalance = (state, action) => {
-  if (balanceUpdateIsStale(state?.senderAssetType, action.senderAssetCurrentBalance?.assetType)) {
+  if (balanceUpdateIsStale(state?.senderAssetType, action.senderAssetType)) {
     return state;
   }
   return {
@@ -251,7 +251,7 @@ const setReceiver  = (state, action) => {
 };
 
 const setReceiverCurrentBalance = (state, action) => {
-  if (balanceUpdateIsStale(state?.receiverAssetType, action.receiverCurrentBalance?.assetType)) {
+  if (balanceUpdateIsStale(state?.receiverAssetType, action.receiverAssetType)) {
     return state;
   }
   return {

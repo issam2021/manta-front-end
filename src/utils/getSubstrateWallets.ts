@@ -1,5 +1,5 @@
 import WALLET_NAME from 'constants/WalletConstants';
-import { getWallets } from '@talismn/connect-wallets';
+import { getWallets } from 'manta-extension-connect';
 
 const getSubstrateWallets = () => {
   return getWallets().filter((wallet) =>

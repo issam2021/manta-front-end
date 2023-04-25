@@ -8,12 +8,14 @@ import {
   getLastAccessedExternalAccount,
   setLastAccessedExternalAccountAddress
 } from 'utils/persistence/externalAccountStorage';
+import Version from 'types/Version';
 import { useKeyring } from './keyringContext';
 import { useSubstrate } from './substrateContext';
+import { useActive } from 'hooks/useActive';
 
-const ExternalAccountContext = createContext();
+const PublicAccountContext = createContext();
 
-export const ExternalAccountContextProvider = (props) => {
+export const PublicAccountContextProvider = (props) => {
   const { api } = useSubstrate();
   const { keyring, isKeyringInit, keyringAddresses } = useKeyring();
   const externalAccountRef = useRef(null);
@@ -22,6 +24,9 @@ export const ExternalAccountContextProvider = (props) => {
   const [extensionSigner, setExtensionSigner] = useState(null);
   const [externalAccountOptions, setExternalAccountOptions] = useState([]);
   const [isInitialAccountSet, setIsInitialAccountSet] = useState(false);
+  const [extensionVersion, setExtensionVersion] = useState(null);
+  const [extensionName, setExtensionName] = useState(null);
+  const isActive = useActive();
 
   const setApiSigner = (api) => {
     api?.setSigner(null);
@@ -38,6 +43,8 @@ export const ExternalAccountContextProvider = (props) => {
       const selectedWallet = substrateExtensions.find(
         (wallet) => wallet.extensionName === source
       );
+      setExtensionName(selectedWallet.extensionName);
+      setExtensionVersion(new Version(selectedWallet._extension.version));
       setExtensionSigner(selectedWallet._signer);
       api.setSigner(selectedWallet._signer);
     }
@@ -98,7 +105,7 @@ export const ExternalAccountContextProvider = (props) => {
     };
     if (!isInitialAccountSet) {
       const interval = setInterval(async () => {
-        setInitialExternalAccount();
+        isActive && setInitialExternalAccount();
       }, 1000);
       return () => clearInterval(interval);
     }
@@ -164,20 +171,22 @@ export const ExternalAccountContextProvider = (props) => {
     externalAccountSigner,
     externalAccountOptions: externalAccountOptions,
     changeExternalAccount,
-    changeExternalAccountOptions
+    changeExternalAccountOptions,
+    extensionVersion,
+    extensionName
   };
 
   return (
-    <ExternalAccountContext.Provider value={value}>
+    <PublicAccountContext.Provider value={value}>
       {props.children}
-    </ExternalAccountContext.Provider>
+    </PublicAccountContext.Provider>
   );
 };
 
-ExternalAccountContextProvider.propTypes = {
+PublicAccountContext.propTypes = {
   children: PropTypes.any
 };
 
-export const useExternalAccount = () => ({
-  ...useContext(ExternalAccountContext)
+export const usePublicAccount = () => ({
+  ...useContext(PublicAccountContext)
 });
