@@ -1,15 +1,15 @@
 // @ts-nocheck
-import WALLET_NAME from 'constants/WalletConstants';
-import React from 'react';
 import Icon from 'components/Icon';
+import WALLET_NAME from 'constants/WalletConstants';
+import { useGlobal } from 'contexts/globalContexts';
 import { useKeyring } from 'contexts/keyringContext';
 import { useMetamask } from 'contexts/metamaskContext';
-import { getSubstrateWallets } from 'utils';
-import getWalletDisplayName from 'utils/display/getWalletDisplayName';
-import { useGlobal } from 'contexts/globalContexts';
+import { usePublicAccount } from 'contexts/publicAccountContext';
 import { useLocation } from 'react-router-dom';
 import { ReactComponent as RecommendedImage } from 'resources/images/recommended-manta-wallet.svg';
+import { getSubstrateWallets } from 'utils';
 import getErrMsgAfterRemovePathname from 'utils/display/getErrMsgAfterRemovePathname';
+import getWalletDisplayName from 'utils/display/getWalletDisplayName';
 
 const ConnectWalletBlock = ({
   extensionName,
@@ -136,6 +136,7 @@ export const SubstrateConnectWalletBlock = ({
   const { connectWallet, connectWalletExtensions, authedWalletList } =
     useKeyring();
   const { usingMantaWallet } = useGlobal();
+  const { externalAccount } = usePublicAccount();
 
   let substrateWallets = getSubstrateWallets();
 
@@ -164,9 +165,9 @@ export const SubstrateConnectWalletBlock = ({
     // wallet.extension would not be defined if enabled not called
     // but for Talisman, when user reject, wallet.extension is still true
     // so we need another method to check the wallet connect status
-    const isWalletEnabled = authedWalletList.includes(wallet.extensionName)
-      ? true
-      : false;
+    const isWalletEnabled =
+      externalAccount && authedWalletList.includes(wallet.extensionName);
+
     return (
       <ConnectWalletBlock
         key={wallet.extensionName}
