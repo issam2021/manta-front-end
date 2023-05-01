@@ -28,7 +28,7 @@ const TradingIncentiveBanner: React.FC<IbannnerProps> = (props) => {
   return (
     <div className={props.className} onClick={() => window.open(activityUrl)}>
       <div className="mr-4 font-red-hat-mono">
-        Earn 2000% of your gas fee paid & additional bonus!
+        Earn 20000% of your gas fee paid as the start & additional bonus!
       </div>
       <div className="mr-4 font-red-hat-mono">Find more details here</div>
       <Icon className="w-6 h-6 cursor-pointer" name="activityRightArrow" />
