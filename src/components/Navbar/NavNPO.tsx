@@ -1,9 +1,9 @@
 import { usePublicAccount } from 'contexts/publicAccountContext';
 import { ReactNode } from 'react';
 
-const ALink = ({ children }: { children: ReactNode }) => (
+const ALink = ({ href, children }: { children: ReactNode; href: string }) => (
   <a
-    href="https://npo.manta.network"
+    href={href}
     className="py-3 w-1/3  text-white text-opacity-60 text-center hover:text-white hover:text-opacity-100 hover:font-bold"
     target="_blank"
     rel="noreferrer">
@@ -13,7 +13,7 @@ const ALink = ({ children }: { children: ReactNode }) => (
 const NavNPO = () => {
   const { externalAccount } = usePublicAccount();
   if (!externalAccount) {
-    return <ALink>NPO</ALink>;
+    return <ALink href="https://npo.manta.network">NPO</ALink>;
   }
   return (
     <div className="group relative">
@@ -23,10 +23,12 @@ const NavNPO = () => {
       <div className="hidden absolute pt-7 top-0 left-1/2 transform -translate-x-1/2  w-32 group-hover:block">
         <ul className="p-4 text-center bg-nav rounded-lg rounded-t-none">
           <li className="mb-4">
-            <ALink>Projects</ALink>
+            <ALink href="https://npo.manta.network">Projects</ALink>
           </li>
           <li>
-            <ALink>My zkNFTs</ALink>
+            <ALink href="https://npo.manta.network/calamari/sbt/list">
+              My zkNFTs
+            </ALink>
           </li>
         </ul>
       </div>
