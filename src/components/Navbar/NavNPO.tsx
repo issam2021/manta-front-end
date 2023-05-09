@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 const ALink = ({ href, children }: { children: ReactNode; href: string }) => (
   <a
     href={href}
-    className="py-3 w-1/3  text-white text-opacity-60 text-center hover:text-white hover:text-opacity-100 hover:font-bold"
+    className="py-3 text-white text-opacity-60 text-center hover:text-white hover:text-opacity-100"
     target="_blank"
     rel="noreferrer">
     {children}
@@ -17,7 +17,7 @@ const NavNPO = () => {
   }
   return (
     <div className="group relative">
-      <span className={'cursor-pointer text-white text-opacity-100 font-bold'}>
+      <span className={'cursor-pointer text-white text-opacity-60 font-bold'}>
         NPO
       </span>
       <div className="hidden absolute pt-7 top-0 left-1/2 transform -translate-x-1/2  w-32 group-hover:block">
