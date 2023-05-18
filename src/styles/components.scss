@@ -98,8 +98,10 @@
         display: none;
     }
     &__closeBtn {
-        top: 10px !important;
-        right: 10px !important;
+        padding: 8px;
+        font-size: 8px !important;
+        top: 8px !important;
+        right: 8px !important;
     }
 }
 

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import WALLET_NAME from 'constants/WalletConstants';
 import React from 'react';
 import classNames from 'classnames';
 import { useTxStatus } from 'contexts/txStatusContext';
@@ -9,6 +10,9 @@ import { useMetamask } from 'contexts/metamaskContext';
 import { API_STATE, useSubstrate } from 'contexts/substrateContext';
 import Chain from 'types/Chain';
 import { useConfig } from 'contexts/configContext';
+import { useGlobal } from 'contexts/globalContexts';
+import { useMantaWallet } from 'contexts/mantaWalletContext';
+import { useKeyring } from 'contexts/keyringContext';
 import { useBridgeTx } from './BridgeContext/BridgeTxContext';
 import { useBridgeData } from './BridgeContext/BridgeDataContext';
 
@@ -16,6 +20,9 @@ const ValidationButton = () => {
   const config = useConfig();
   const { apiState } = useSubstrate();
   const { externalAccount } = usePublicAccount();
+  const { usingMantaWallet } = useGlobal();
+  const { showChangeNetworkNotification } = useMantaWallet();
+  const { selectedWallet } = useKeyring();
   const {
     senderAssetType,
     minInput,
@@ -30,7 +37,8 @@ const ValidationButton = () => {
   const { ethAddress, chainId } = useMetamask();
   const { txStatus } = useTxStatus();
   const disabled = txStatus?.isProcessing();
-  const apiIsDisconnected = apiState === API_STATE.ERROR || apiState === API_STATE.DISCONNECTED;
+  const apiIsDisconnected =
+    apiState === API_STATE.ERROR || apiState === API_STATE.DISCONNECTED;
 
   const evmIsEnabled = originChainIsEvm || destinationChainIsEvm;
 
@@ -46,8 +54,18 @@ const ValidationButton = () => {
     connectWalletText = 'Connect MetaMask';
   } else if (apiIsDisconnected) {
     validationMsg = 'Connecting to network';
-  } else if (evmIsEnabled && originChainIsEvm && chainId !== Chain.Moonriver(config).ethChainId) {
+  } else if (
+    evmIsEnabled &&
+    originChainIsEvm &&
+    chainId !== Chain.Moonriver(config).ethChainId
+  ) {
     isSwitchNetwork = true;
+  } else if (
+    usingMantaWallet &&
+    selectedWallet?.extensionName === WALLET_NAME.MANTA &&
+    showChangeNetworkNotification
+  ) {
+    validationMsg = 'Switch Networks in Manta Wallet';
   } else if (!senderAssetTargetBalance) {
     validationMsg = 'Enter amount';
   } else if (userHasSufficientFunds() === false) {
@@ -79,7 +97,8 @@ const ValidationButton = () => {
     !disabled && !isConnectWallet && !validationMsg && !isSwitchNetwork;
   const shouldShowConnectWallet = !disabled && isConnectWallet;
   const shouldShowValidation = !disabled && !isConnectWallet && validationMsg;
-  const shouldShowSwitchNetwork = !disabled && !isConnectWallet && !validationMsg && isSwitchNetwork;
+  const shouldShowSwitchNetwork =
+    !disabled && !isConnectWallet && !validationMsg && isSwitchNetwork;
 
   return (
     <>
@@ -95,7 +114,7 @@ const ValidationButton = () => {
         />
       )}
       {shouldShowValidation && <ValidationText validationMsg={validationMsg} />}
-      {shouldShowSwitchNetwork && <SwitchNetworkButton/>}
+      {shouldShowSwitchNetwork && <SwitchNetworkButton />}
     </>
   );
 };

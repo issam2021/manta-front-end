@@ -35,6 +35,11 @@ export type RequestSbtInfo = {
   signature?: string;
   metadata?: string;
 };
+export type RequestMatchPrivateTransaction = {
+  extrinsicHash: string
+  method: string
+}
+
 export type PrivateWallet = {
   getWalletState(): Promise<PrivateWalletStateInfo>;
   walletSync(): Promise<boolean>;
@@ -50,4 +55,5 @@ export type PrivateWallet = {
   subscribeWalletState: (
     cb: (state: PrivateWalletStateInfo) => void | Promise<void>
   ) => Unsubcall;
+  matchPrivateTransaction: (payload: RequestMatchPrivateTransaction) => void;
 };

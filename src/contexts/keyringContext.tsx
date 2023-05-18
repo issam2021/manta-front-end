@@ -145,6 +145,10 @@ export const KeyringContextProvider = ({
       isFromConnectModal = false
     ) => {
       if (!isKeyringInit) {
+        setWalletConnectingErrorMessages({
+          ...walletConnectingErrorMessages,
+          ...{ [extensionName]: 'not init keyring yet' }
+        });
         return false;
       }
       if (walletConnectingErrorMessages[extensionName]) {

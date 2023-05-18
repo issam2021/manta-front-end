@@ -25,6 +25,7 @@ import { ReactComponent as swap } from 'resources/icons/sidebar/swap.svg';
 import { ReactComponent as transact } from 'resources/icons/sidebar/transact.svg';
 
 // widesite icons
+import { ReactComponent as warningV2 } from 'resources/icons/warningV2.svg';
 import { ReactComponent as token } from 'resources/icons/token-icon.svg';
 import { ReactComponent as deposit } from 'resources/icons/deposit-icon.svg';
 import { ReactComponent as rowDown } from 'resources/icons/rowdown-icon.svg';
@@ -175,6 +176,7 @@ const icons = {
   Medium,
   Docs,
   BugReport,
-  activityRightArrow
+  activityRightArrow,
+  warningV2
 };
 export default icons;

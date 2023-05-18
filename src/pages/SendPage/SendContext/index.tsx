@@ -29,7 +29,11 @@ export const SendContextProvider = (props) => {
   const { setTxStatus, txStatus, txStatusRef } = useTxStatus();
   const { externalAccount, externalAccountSigner } = usePublicAccount();
   const privateWallet = usePrivateWallet();
-  const { isReady: privateWalletIsReady, privateAddress } = privateWallet;
+  const {
+    isReady: privateWalletIsReady,
+    privateAddress,
+    txFee
+  } = privateWallet;
   const [state, dispatch] = useReducer(sendReducer, buildInitState(config));
   const isActive = useActive();
   const {
@@ -39,8 +43,7 @@ export const SendContextProvider = (props) => {
     senderNativeTokenPublicBalance,
     senderPublicAccount,
     receiverAssetType,
-    receiverAddress,
-    receiverCurrentBalance
+    receiverAddress
   } = state;
 
   /**
@@ -374,8 +377,10 @@ export const SendContextProvider = (props) => {
     let feeEstimate;
     if (config.NETWORK_NAME === NETWORK.DOLPHIN) {
       feeEstimate = Balance.fromBaseUnits(AssetType.Native(config), 50);
+      if (usingMantaWallet && txFee?.current) feeEstimate = txFee.current;
     } else if (config.NETWORK_NAME === NETWORK.CALAMARI) {
       feeEstimate = Balance.fromBaseUnits(AssetType.Native(config), 1);
+      if (usingMantaWallet && txFee?.current) feeEstimate = txFee.current;
     } else {
       throw new Error('Unknown network');
     }
@@ -606,11 +611,15 @@ export const SendContextProvider = (props) => {
       senderAssetTargetBalance,
       receiverAddress
     );
-    try {
-      await tx.signAndSend(externalAccountSigner, handleTxRes);
-    } catch (e) {
-      console.error('Failed to send transaction', e);
-      setTxStatus(TxStatus.failed('Transaction declined'));
+    if (usingMantaWallet) {
+      await privateWallet.publicTransfer([tx], handleTxRes);
+    } else {
+      try {
+        await tx.signAndSend(externalAccountSigner, handleTxRes);
+      } catch (e) {
+        console.error('Failed to send transaction', e);
+        setTxStatus(TxStatus.failed('Transaction declined'));
+      }
     }
   };
 

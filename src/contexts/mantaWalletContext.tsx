@@ -1,7 +1,10 @@
+import NETWORK from 'constants/NetworkConstants';
+import WALLET_NAME from 'constants/WalletConstants';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { EventRecord, ExtrinsicStatus } from '@polkadot/types/interfaces';
 import { BN } from 'bn.js';
-import WALLET_NAME from 'constants/WalletConstants';
+import { WarningNotification } from 'components/NotificationContent';
+import { Notification } from 'element-react';
 import {
   MutableRefObject,
   ReactNode,
@@ -16,8 +19,13 @@ import {
 import AssetType from 'types/AssetType';
 import Balance from 'types/Balance';
 import TxStatus from 'types/TxStatus';
+import Version from 'types/Version';
 import { getSubstrateWallets } from 'utils';
 import { removePendingTxHistoryEvent } from 'utils/persistence/privateTransactionHistory';
+import getPageName from 'utils/display/getPageName';
+import { useLocation } from 'react-router-dom';
+import { useKeyring } from 'contexts/keyringContext';
+import { getLastAccessedWallet } from 'utils/persistence/walletStorage';
 import { useConfig } from './configContext';
 import { useGlobal } from './globalContexts';
 import { PrivateWallet } from './mantaWalletType';
@@ -46,6 +54,7 @@ type MantaWalletContext = {
   privateWallet: PrivateWallet | null;
   sync: () => Promise<void>;
   isInitialSync: MutableRefObject<boolean>;
+  txFee: MutableRefObject<Balance | null>;
 };
 
 const MantaWalletContext = createContext<MantaWalletContext | null>(null);
@@ -56,12 +65,15 @@ export const MantaWalletContextProvider = ({
   children: ReactNode;
 }) => {
   // external contexts
-  const { NETWORK_NAME: network } = useConfig();
+  const config = useConfig();
+  const { NETWORK_NAME: network } = config;
   const { usingMantaWallet } = useGlobal();
   const { api } = useSubstrate();
   const { externalAccount } = usePublicAccount();
   const publicAddress = externalAccount?.address;
   const { setTxStatus } = useTxStatus();
+  const { pathname } = useLocation();
+  const { selectedWallet } = useKeyring();
 
   // private wallet
   const [privateWallet, setPrivateWallet] = useState<PrivateWallet | null>(
@@ -74,9 +86,15 @@ export const MantaWalletContextProvider = ({
   const [hasFinishedInitialBlockDownload, setHasFinishedInitialBlockDownload] =
     useState<boolean | null>(null);
   const [isBusy, setIsBusy] = useState<boolean>(false);
+  const [mantaWalletVersion, setMantaWalletVersion] = useState<Version | null>(
+    null
+  );
+  const [showChangeNetworkNotification, setShowChangeNetworkNotification] =
+    useState(false);
   const { mantaWalletInitialSync, setMantaWalletInitialSync } = useGlobal();
 
   // transaction state
+  const txFee = useRef<Balance | null>(null);
   const txQueue = useRef<SubmittableExtrinsic<'promise', any>[]>([]);
   const finalTxResHandler = useRef<txResHandlerType<any> | null>(null);
 
@@ -101,12 +119,31 @@ export const MantaWalletContextProvider = ({
   });
 
   useEffect(() => {
+    let unsub: any;
     const getZkAddress = async () => {
-      if (!privateAddress) {
-        const mantaWallet = await getMantaWallet();
-        if (!mantaWallet || !privateWallet) {
-          return;
-        }
+      const mantaWallet = await getMantaWallet();
+      if (!mantaWallet || !privateWallet) {
+        return;
+      }
+      // @ts-ignore
+      const _mantaWalletVersion = new Version(mantaWallet._extension.version);
+      setMantaWalletVersion(_mantaWalletVersion);
+      const SUBSCRIBE_ACCOUNTS_FIRST_VERSION = new Version('0.0.12');
+      if (_mantaWalletVersion.gte(SUBSCRIBE_ACCOUNTS_FIRST_VERSION)) {
+        unsub = await mantaWallet.subscribeAccounts((accounts) => {
+          if (!accounts || accounts.length <= 0) {
+            return;
+          }
+          // @ts-ignore
+          const { zkAddress, network: walletNetwork } = accounts[0];
+          if (walletNetwork !== network) {
+            setShowChangeNetworkNotification(true);
+          } else {
+            setShowChangeNetworkNotification(false);
+          }
+          setPrivateAddress(zkAddress);
+        });
+      } else {
         const accounts = await mantaWallet.getAccounts();
         if (!accounts || accounts.length <= 0) {
           return;
@@ -117,7 +154,39 @@ export const MantaWalletContextProvider = ({
       }
     };
     getZkAddress();
-  }, [privateWallet, signerIsConnected, isReady, isBusy]);
+    return () => unsub && unsub();
+  }, [privateWallet, signerIsConnected, isReady, isBusy, network]);
+
+  useEffect(() => {
+    // We can not use `selectedWallet` directly to do a check, because it changes when page loading.
+    // Use localstorage `lastAccessedWallet` value instead. The localstorage value changes after `selectedWallet` changes.
+    // So use a setTimeout here.
+    setTimeout(() => {
+      // because for now, we have dolphin & calamari mantaWalletContext running at the same time,
+      // we have to add the network type check to only show the Notification once
+      const isCalamari = window.location.pathname.includes('calamari');
+      const isDolphin = window.location.pathname.includes('dolphin');
+      const isMantapayPage = window.location.pathname.includes('transact');
+      if (
+        showChangeNetworkNotification &&
+        (isMantapayPage ||
+          (!isMantapayPage &&
+            getLastAccessedWallet()?.extensionName === WALLET_NAME.MANTA)) &&
+        ((isCalamari && network === NETWORK.CALAMARI) ||
+          (isDolphin && network === NETWORK.DOLPHIN))
+      ) {
+        const updateVersionWarningInfo = {
+          title: 'Please switch networks',
+          content: `To use ${getPageName()} on ${network}, please select ${network} network in Manta Wallet.`
+        };
+        Notification({
+          message: <WarningNotification {...updateVersionWarningInfo} />,
+          duration: 15000,
+          offset: 70
+        });
+      }
+    }, 0);
+  }, [showChangeNetworkNotification, pathname, selectedWallet]);
 
   useEffect(() => {
     let unsub;
@@ -173,6 +242,27 @@ export const MantaWalletContextProvider = ({
     initialSync();
   }, [isReady, mantaWalletInitialSync, privateWallet]);
 
+  const getFinalTxResHandler = (
+    baseTxResHandler: txResHandlerType<any>,
+    finalTx: SubmittableExtrinsic<'promise', any>
+  ) => {
+    return async (res: any) => {
+      const { status, txHash } = res;
+      const txHistoryIsEnabled =
+        typeof privateWallet?.matchPrivateTransaction === 'function';
+      if (status.isBroadcast && usingMantaWallet && txHistoryIsEnabled) {
+        // update transaction history in Manta Wallet
+        const matchData = {
+          network,
+          extrinsicHash: txHash.toHex(),
+          method: finalTx.method.toHex()
+        };
+        await privateWallet?.matchPrivateTransaction(matchData);
+      }
+      await baseTxResHandler(res, undefined);
+    };
+  };
+
   const handleInternalTxRes = async ({
     status,
     events
@@ -194,6 +284,14 @@ export const MantaWalletContextProvider = ({
     }
   };
 
+  const getTransactionFee = async (
+    transaction: SubmittableExtrinsic<'promise', any>
+  ) => {
+    const paymentInfo = await transaction.paymentInfo(externalAccount);
+    const feeAmount = new BN(paymentInfo.partialFee.toString());
+    return Balance.Native(config, feeAmount);
+  };
+
   const publishNextBatch = async () => {
     const sendExternal = async () => {
       try {
@@ -203,6 +301,7 @@ export const MantaWalletContextProvider = ({
           setTxStatus(TxStatus.failed(''));
           return;
         }
+        txFee.current = await getTransactionFee(lastTx);
         await lastTx.signAndSend(publicAddress, finalTxResHandler.current);
         setTxStatus(TxStatus.processing(null, lastTx.hash.toString()));
       } catch (e) {
@@ -237,7 +336,8 @@ export const MantaWalletContextProvider = ({
     txResHandler: txResHandlerType<any>
   ) => {
     txQueue.current = batches;
-    finalTxResHandler.current = txResHandler;
+    const finalTx = txQueue.current[txQueue.current.length - 1];
+    finalTxResHandler.current = getFinalTxResHandler(txResHandler, finalTx);
     try {
       publishNextBatch();
       return true;
@@ -298,6 +398,20 @@ export const MantaWalletContextProvider = ({
     [privateWallet, publicAddress, network, api]
   );
 
+  const publicTransfer = useCallback(
+    async (
+      batches: SubmittableExtrinsic<'promise', any>[],
+      txResHandler: txResHandlerType<any>
+    ) => {
+      try {
+        await publishBatchesSequentially(batches, txResHandler);
+      } catch (e) {
+        setTxStatus(TxStatus.failed('Transaction declined'));
+      }
+    },
+    [privateWallet, publicAddress, network, api]
+  );
+
   const toPrivate = useCallback(
     async (balance: Balance, txResHandler: txResHandlerType<any>) => {
       try {
@@ -325,10 +439,14 @@ export const MantaWalletContextProvider = ({
       toPrivate,
       toPublic,
       privateTransfer,
+      publicTransfer,
       privateWallet,
       sync,
       isInitialSync: { current: false },
-      signerIsConnected
+      signerIsConnected,
+      txFee,
+      mantaWalletVersion,
+      showChangeNetworkNotification
     }),
     [
       isReady,
@@ -340,9 +458,13 @@ export const MantaWalletContextProvider = ({
       toPrivate,
       toPublic,
       privateTransfer,
+      publicTransfer,
       sync,
       privateWallet,
-      signerIsConnected
+      signerIsConnected,
+      txFee,
+      mantaWalletVersion,
+      showChangeNetworkNotification
     ]
   );
 

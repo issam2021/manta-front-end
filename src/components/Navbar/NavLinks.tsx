@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import { dolphinConfig } from 'config';
 import { useConfig } from 'contexts/configContext';
 import { NavLink } from 'react-router-dom';
-import NavNPO from './NavNPO';
 
 const NAVLINKPATH = {
   Transact: '/transact',
@@ -49,7 +48,15 @@ const NavLinks = () => {
         )}>
         Bridge
       </NavLink>
-      {!isDolphinPage && <NavNPO />}
+      {!isDolphinPage && (
+        <a
+          href="https://npo.manta.network"
+          className="py-3 text-white text-opacity-60 text-center hover:text-white hover:text-opacity-100"
+          target="_blank"
+          rel="noreferrer">
+          NPO
+        </a>
+      )}
 
       {!isDolphinPage && (
         <NavLink
