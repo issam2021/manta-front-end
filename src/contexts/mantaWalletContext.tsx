@@ -1,9 +1,10 @@
-import NETWORK from 'constants/NetworkConstants';
-import WALLET_NAME from 'constants/WalletConstants';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { EventRecord, ExtrinsicStatus } from '@polkadot/types/interfaces';
 import { BN } from 'bn.js';
 import { WarningNotification } from 'components/NotificationContent';
+import NETWORK from 'constants/NetworkConstants';
+import WALLET_NAME from 'constants/WalletConstants';
+import { useKeyring } from 'contexts/keyringContext';
 import { Notification } from 'element-react';
 import {
   MutableRefObject,
@@ -16,15 +17,14 @@ import {
   useRef,
   useState
 } from 'react';
+import { useLocation } from 'react-router-dom';
 import AssetType from 'types/AssetType';
 import Balance from 'types/Balance';
 import TxStatus from 'types/TxStatus';
 import Version from 'types/Version';
 import { getSubstrateWallets } from 'utils';
-import { removePendingTxHistoryEvent } from 'utils/persistence/privateTransactionHistory';
 import getPageName from 'utils/display/getPageName';
-import { useLocation } from 'react-router-dom';
-import { useKeyring } from 'contexts/keyringContext';
+import { removePendingTxHistoryEvent } from 'utils/persistence/privateTransactionHistory';
 import { getLastAccessedWallet } from 'utils/persistence/walletStorage';
 import { useConfig } from './configContext';
 import { useGlobal } from './globalContexts';
@@ -302,7 +302,7 @@ export const MantaWalletContextProvider = ({
           return;
         }
         txFee.current = await getTransactionFee(lastTx);
-        await lastTx.signAndSend(publicAddress, finalTxResHandler.current);
+        await lastTx.signAndSend(publicAddress, { nonce: -1 }, finalTxResHandler.current);
         setTxStatus(TxStatus.processing(null, lastTx.hash.toString()));
       } catch (e) {
         console.error('Error publishing private transaction batch', e);
@@ -315,7 +315,11 @@ export const MantaWalletContextProvider = ({
     const sendInternal = async () => {
       try {
         const internalTx: any = txQueue.current.shift();
-        await internalTx.signAndSend(publicAddress, handleInternalTxRes);
+        await internalTx.signAndSend(
+          publicAddress,
+          { nonce: -1 },
+          handleInternalTxRes
+        );
       } catch (e) {
         setTxStatus(TxStatus.failed('internalTx failed'));
         txQueue.current = [];

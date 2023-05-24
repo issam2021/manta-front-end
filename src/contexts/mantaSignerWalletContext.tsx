@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { BN } from 'bn.js';
+import { useActive } from 'hooks/useActive';
 import { Environment, MantaPrivateWallet, MantaUtilities } from 'manta.js';
 import PropTypes from 'prop-types';
 import {
@@ -16,7 +17,6 @@ import TxStatus from 'types/TxStatus';
 import Version from 'types/Version';
 import { removePendingTxHistoryEvent } from 'utils/persistence/privateTransactionHistory';
 import versionIsOutOfDate from 'utils/validation/versionIsOutOfDate';
-import { useActive } from 'hooks/useActive';
 import { useConfig } from './configContext';
 import { useGlobal } from './globalContexts';
 import { usePublicAccount } from './publicAccountContext';
@@ -224,6 +224,7 @@ export const MantaSignerWalletContextProvider = (props) => {
         const lastTx = txQueue.current.shift();
         await lastTx.signAndSend(
           externalAccountSigner,
+          { nonce: -1 },
           finalTxResHandler.current
         );
         setTxStatus(TxStatus.processing(null, lastTx.hash.toString()));
@@ -240,6 +241,7 @@ export const MantaSignerWalletContextProvider = (props) => {
         const internalTx = txQueue.current.shift();
         await internalTx.signAndSend(
           externalAccountSigner,
+          { nonce: -1 },
           handleInternalTxRes
         );
       } catch (e) {

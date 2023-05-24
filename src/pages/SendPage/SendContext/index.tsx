@@ -615,7 +615,7 @@ export const SendContextProvider = (props) => {
       await privateWallet.publicTransfer([tx], handleTxRes);
     } else {
       try {
-        await tx.signAndSend(externalAccountSigner, handleTxRes);
+        await tx.signAndSend(externalAccountSigner, { nonce: -1 }, handleTxRes);
       } catch (e) {
         console.error('Failed to send transaction', e);
         setTxStatus(TxStatus.failed('Transaction declined'));
