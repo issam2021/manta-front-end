@@ -1,18 +1,17 @@
 // @ts-nocheck
-import React from 'react';
 import { ColDef } from 'ag-grid-community';
-import { useModal } from 'hooks';
 import Button from 'components/Button';
 import SortableTable from 'components/SortableTable';
+import { useConfig } from 'contexts/configContext';
 import { usePublicAccount } from 'contexts/publicAccountContext';
+import { useSubstrate } from 'contexts/substrateContext';
+import { useModal } from 'hooks';
+import Collator from 'types/Collator';
 import Delegation from 'types/Delegation';
 import getTableHeight from 'utils/ui/getTableHeight';
-import { useSubstrate } from 'contexts/substrateContext';
-import Collator from 'types/Collator';
-import { useConfig } from 'contexts/configContext';
 import { StakeModal } from '../Modals';
-import { useStakeData } from '../StakeContext/StakeDataContext';
 import { UnstakeModal } from '../Modals/UnstakeModal';
+import { useStakeData } from '../StakeContext/StakeDataContext';
 import StakeErrorDisplay from '../StakeErrorDisplay';
 import CollatorDisplayCell from './CollatorDisplayCell';
 
@@ -197,6 +196,7 @@ const StakingTable = () => {
             {!unstakeRequest ? (
               <>
                 <Button
+                  disabled
                   className="px-6 btn-secondary flex items-center justify-center h-10"
                   onClick={onClickStake}
                 >
