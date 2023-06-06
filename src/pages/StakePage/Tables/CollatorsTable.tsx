@@ -1,17 +1,17 @@
 // @ts-nocheck
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from 'react';
 import { ColDef } from 'ag-grid-community';
+import Select from 'react-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { useModal } from 'hooks';
 import Button from 'components/Button';
 import SortableTable from 'components/SortableTable';
-import { useSubstrate } from 'contexts/substrateContext';
-import { useModal } from 'hooks';
-import { useState } from 'react';
-import Select from 'react-select';
 import getTableHeight from 'utils/ui/getTableHeight';
+import { useSubstrate } from 'contexts/substrateContext';
 import { StakeModal } from '../Modals';
-import { UnstakeModal } from '../Modals/UnstakeModal';
 import { useStakeData } from '../StakeContext/StakeDataContext';
+import { UnstakeModal } from '../Modals/UnstakeModal';
 import StakeErrorDisplay from '../StakeErrorDisplay';
 import CollatorDisplayCell from './CollatorDisplayCell';
 
@@ -211,8 +211,7 @@ const CollatorsTable = () => {
           <div className="flex pr-2 justify-end w-full gap-3">
             {!unstakeRequest && (
               <Button
-                disabled
-                className="px-6 btn-secondary opacity-40 flex items-center justify-start h-10"
+                className="px-6 btn-secondary flex items-center justify-start h-10"
                 onClick={onClickStake}>
                 Stake
               </Button>
@@ -263,9 +262,10 @@ const CollatorsTable = () => {
         </div>
         <div className="ml-auto flex items-center">
           <a
+            href="https://docs.manta.network/docs/calamari/Staking/Collation/Overview"
             target="_blank"
             className={
-              'p-3 cursor-not-allowed brightness-50 filter text-sm btn-hover unselectable-text text-center rounded-lg btn-primary w-full hover:text-white font-red-hat-text'
+              'p-3 cursor-pointer text-sm btn-hover unselectable-text text-center rounded-lg btn-primary w-full hover:text-white font-red-hat-text'
             }
             rel="noreferrer">
             Launch your own collator

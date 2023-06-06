@@ -1,19 +1,20 @@
 // @ts-nocheck
 import WALLET_NAME from 'constants/WalletConstants';
+import React from 'react';
 import classNames from 'classnames';
-import { ConnectWalletButton } from 'components/Accounts/ConnectWallet';
+import { useTxStatus } from 'contexts/txStatusContext';
 import MantaLoading from 'components/Loading';
+import { ConnectWalletButton } from 'components/Accounts/ConnectWallet';
+import { usePublicAccount } from 'contexts/publicAccountContext';
+import { useMetamask } from 'contexts/metamaskContext';
+import { API_STATE, useSubstrate } from 'contexts/substrateContext';
+import Chain from 'types/Chain';
 import { useConfig } from 'contexts/configContext';
 import { useGlobal } from 'contexts/globalContexts';
-import { useKeyring } from 'contexts/keyringContext';
 import { useMantaWallet } from 'contexts/mantaWalletContext';
-import { useMetamask } from 'contexts/metamaskContext';
-import { usePublicAccount } from 'contexts/publicAccountContext';
-import { API_STATE, useSubstrate } from 'contexts/substrateContext';
-import { useTxStatus } from 'contexts/txStatusContext';
-import Chain from 'types/Chain';
-import { useBridgeData } from './BridgeContext/BridgeDataContext';
+import { useKeyring } from 'contexts/keyringContext';
 import { useBridgeTx } from './BridgeContext/BridgeTxContext';
+import { useBridgeData } from './BridgeContext/BridgeDataContext';
 
 const ValidationButton = () => {
   const config = useConfig();
@@ -92,8 +93,6 @@ const ValidationButton = () => {
     );
   };
 
-  return <ValidationText validationMsg="System Maintenance" />;
-
   const shouldShowSendButton =
     !disabled && !isConnectWallet && !validationMsg && !isSwitchNetwork;
   const shouldShowConnectWallet = !disabled && isConnectWallet;
@@ -145,16 +144,6 @@ const SendButton = () => {
   const onClick = () => {
     send();
   };
-
-  return (
-    <div
-      className={classNames(
-        'bg-connect-wallet-button opacity-40 py-2 cursor-not-allowed unselectable-text',
-        'text-center text-white rounded-lg w-full'
-      )}>
-      System Maintenance
-    </div>
-  );
 
   return (
     <button
