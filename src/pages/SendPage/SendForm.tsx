@@ -75,7 +75,7 @@ const SendForm = () => {
           </div>
           <SendToForm />
         </div>
-        {!isDolphinPage && <SwitchMantaWalletAndSigner />}
+        <SwitchMantaWalletAndSigner />
       </div>
     </div>
   );

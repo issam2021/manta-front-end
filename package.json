@@ -1,6 +1,6 @@
 {
     "name": "manta-web-app",
-    "version": "6.0.3",
+    "version": "6.0.4",
     "private": false,
     "dependencies": {
         "@acala-network/api": "^4.1.6-29",
@@ -48,7 +48,7 @@
         "husky": "^7.0.1",
         "manta-extension-connect": "^1.2.3",
         "manta-polkawallet-bridge": "0.4.0",
-        "manta.js": "3.0.1",
+        "manta.js": "3.0.2",
         "moonbeam-types-bundle": "2.0.8",
         "node-sass": "^7.0.1",
         "postcss": "^7.0.36",

@@ -5,11 +5,9 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState
 } from 'react';
-import { useLocation } from 'react-router-dom';
 import store from 'store';
 import { KeyringContextProvider } from './keyringContext';
 
@@ -19,16 +17,6 @@ const GlobalContextProvider = ({ children }) => {
   const initValue = store.get(localStorageKeys.UsingMantaWallet, true);
   const [usingMantaWallet, _setUsingMantaWallet] = useState(initValue);
   const [mantaWalletInitialSync, _setMantaWalletInitialSync] = useState(true);
-  const { pathname } = useLocation();
-  const isDolphinPage = pathname.includes('dolphin');
-
-  useEffect(() => {
-    if (isDolphinPage) {
-      _setUsingMantaWallet(false); // force to use manta signer only
-      return;
-    }
-    _setUsingMantaWallet(initValue);
-  }, [isDolphinPage]);
 
   const setUsingMantaWallet = useCallback((state) => {
     _setUsingMantaWallet(state);

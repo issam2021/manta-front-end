@@ -286,7 +286,7 @@ export const MantaSignerWalletContextProvider = (props) => {
       const batches = signResult.txs;
       await publishBatchesSequentially(batches, txResHandler);
     },
-    [privateWallet, extensionSigner, externalAccount?.address, api]
+    [privateWallet, extensionSigner, externalAccount?.address, externalAccountSigner, api]
   );
 
   const privateTransfer = useCallback(
@@ -305,7 +305,7 @@ export const MantaSignerWalletContextProvider = (props) => {
       const batches = signResult.txs;
       await publishBatchesSequentially(batches, txResHandler);
     },
-    [privateWallet, extensionSigner, externalAccount?.address, api]
+    [privateWallet, extensionSigner, externalAccount?.address, externalAccountSigner, api]
   );
 
   const toPrivate = useCallback(
@@ -323,7 +323,7 @@ export const MantaSignerWalletContextProvider = (props) => {
       const batches = signResult.txs;
       await publishBatchesSequentially(batches, txResHandler);
     },
-    [privateWallet, extensionSigner, externalAccount?.address, api]
+    [privateWallet, extensionSigner, externalAccount?.address, externalAccountSigner, api]
   );
 
   const value = useMemo(

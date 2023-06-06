@@ -315,3 +315,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - [\#1075](https://github.com/Manta-Network/manta-front-end/pull/1075) Fix signAndSend nonce
+
+
+## [6.0.4] - 2023-6-06
+
+### Fixed
+
+- [\#1090](https://github.com/Manta-Network/manta-front-end/pull/1090) Fix error building transactions while in Manta Signer mode
+- [\#1099](https://github.com/Manta-Network/manta-front-end/pull/1099) Possibly fix issue with wallet not connecting in some inconsistent cases (can't reproduce)
+- [\#1078](https://github.com/Manta-Network/manta-front-end/pull/1078) Subscribe to Manta Wallet accounts
+
+

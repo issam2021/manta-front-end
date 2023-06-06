@@ -3,7 +3,11 @@ module.exports = {
     browser: true,
     es2021: true
   },
-  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended'
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
@@ -25,13 +29,19 @@ module.exports = {
     semi: ['error', 'always'],
     'no-unused-vars': [
       'error',
-      { vars: 'all', args: 'after-used', ignoreRestSiblings: false, argsIgnorePattern: '^_' }
+      {
+        vars: 'all',
+        args: 'after-used',
+        ignoreRestSiblings: false,
+        argsIgnorePattern: '^_'
+      }
     ],
     'import/order': [
       'error',
       { groups: ['builtin', 'external', 'parent', 'sibling', 'index'] }
     ],
     'jsx-quotes': ['error', 'prefer-double'],
-    'no-useless-escape': 'off'
+    'no-useless-escape': 'off',
+    'react/react-in-jsx-scope': 'off'
   }
 };
