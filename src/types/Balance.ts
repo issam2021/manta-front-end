@@ -62,8 +62,12 @@ export default class Balance {
   }
 
   toDisplayString(decimals = 3, roundDown = true): string {
+    const _valueBaseUnits = this.valueBaseUnits();
+    if (_valueBaseUnits.gt(0) && _valueBaseUnits.lt(0.01)) {
+      return `< 0.01 ${this.assetType.ticker}`;
+    }
     const rounding = roundDown ? Decimal.ROUND_DOWN : Decimal.ROUND_UP;
-    return `${this.valueBaseUnits()
+    return `${_valueBaseUnits
       .toDecimalPlaces(decimals, rounding)
       .toNumber()
       .toLocaleString(undefined, {
