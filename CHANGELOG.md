@@ -329,3 +329,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - [\#1111](https://github.com/Manta-Network/manta-front-end/pull/1111) Fix staking rewards decimals
+
+## [6.0.6] - 2023-6-21
+
+### Added
+
+- [\#1118](https://github.com/Manta-Network/manta-front-end/pull/1118) Add Trading Incentive Activity New Banner

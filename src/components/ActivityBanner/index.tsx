@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import {
   getGiantSquidBannerIsActive,
-  getTradingIncentiveBannerIsActive
+  getTradingIncentiveBannerIsActive,
+  getIncentiveAllowListBannerIsActive
 } from 'utils/time/timeDuring';
 import GiantSquidBanner from './GiantSquidBanner';
 import TradingIncentiveBanner from './TradingIncentiveBanner';
-
+import IncentiveAllowListBanner from './IncentiveAllowListBanner';
 export enum BANNER_TYPE {
   GIANT_SQUID,
   TRADING_INCENTIVE,
+  INCENTIVE_ALLOW,
   DEFAULT
 }
 
@@ -27,6 +29,8 @@ const ActivityBanner: React.FC<object> = () => {
       setBannerType(BANNER_TYPE.GIANT_SQUID);
     } else if (getTradingIncentiveBannerIsActive()) {
       setBannerType(BANNER_TYPE.TRADING_INCENTIVE);
+    } else if (getIncentiveAllowListBannerIsActive()) {
+      setBannerType(BANNER_TYPE.INCENTIVE_ALLOW);
     } else {
       setBannerType(BANNER_TYPE.DEFAULT);
     }
@@ -36,6 +40,8 @@ const ActivityBanner: React.FC<object> = () => {
     return <GiantSquidBanner className={normalClass} />;
   } else if (bannerType === BANNER_TYPE.TRADING_INCENTIVE) {
     return <TradingIncentiveBanner className={normalClass} />;
+  } else if (bannerType === BANNER_TYPE.INCENTIVE_ALLOW) {
+    return <IncentiveAllowListBanner className={normalClass} />;
   }
   return null;
 };
