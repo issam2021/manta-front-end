@@ -7,7 +7,7 @@ const IncentiveAllowBanner: React.FC<IbannnerProps> = (props) => {
       className={props.className}
       onClick={() =>
         window.open(
-          'https://activity.manta.network/the-manta-shield/extendweek'
+          'https://activity.manta.network/the-manta-shield/extended-week'
         )
       }>
       <div className="mr-4">
