@@ -335,3 +335,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - [\#1118](https://github.com/Manta-Network/manta-front-end/pull/1118) Add Trading Incentive Activity New Banner
+
+## [6.0.7] - 2023-6-26
+
+### Fixed
+
+- [\#1128](https://github.com/Manta-Network/manta-front-end/pull/1128) `return unsub()` => `return () => unsub()`
