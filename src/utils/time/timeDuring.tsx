@@ -5,8 +5,8 @@ const giantSquidEndTimeStr = 'Fri Mar 31 2023 00:00:00 GMT+0800 (中国标准时
 const tradingIncentiveStartTimeStr = 'Apr 28 2023 12:00:00 UTC';
 const tradingIncentiveEndTimeStr = 'Jun 02 2023 2:00:00 UTC';
 
-const incentiveAllowStartTimeStr = 'Jun 26 2023 14:00:00 UTC';
-const incentiveAllowEndTimeStr = 'Jul 03 2023 14:00:00 UTC';
+const incentiveAllowStartTimeStr = 'Jul 10 2023 14:00:00 UTC';
+const incentiveAllowEndTimeStr = 'Jul 17 2023 14:00:00 UTC';
 
 export const getGiantSquidBannerIsActive = (): boolean => {
   return getTimeWindowIsActive(
