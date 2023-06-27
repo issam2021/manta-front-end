@@ -341,3 +341,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - [\#1128](https://github.com/Manta-Network/manta-front-end/pull/1128) `return unsub()` => `return () => unsub()`
+
+## [6.0.8] - 2023-6-27
+
+### Fixed
+
+- [\#1131](https://github.com/Manta-Network/manta-front-end/pull/1131) Fix bridging and bridge transaction fee estimation
