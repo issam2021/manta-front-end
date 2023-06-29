@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js';
 import BN from 'bn.js';
+import { bool } from '@polkadot/types';
 import AssetType from './AssetType';
 import Usd from './Usd';
 export default class Balance {
@@ -143,6 +144,10 @@ export default class Balance {
   div(num: BN): Balance {
     const value = this.valueAtomicUnits.div(num);
     return new Balance(this.assetType, value);
+  }
+
+  isZero(): boolean {
+    return this.valueAtomicUnits.eq(new BN(0));
   }
 
   static max(a: Balance, b: Balance): Balance {

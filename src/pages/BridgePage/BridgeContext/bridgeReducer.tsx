@@ -46,7 +46,7 @@ export const buildInitState = (config) => {
   } else {
     initOriginChain = initOriginChainOptions[0];
   }
-  
+
   const initDestinationChainOptions = getDestinationChainOptions(
     initOriginChain, initOriginChainOptions
   );
@@ -56,7 +56,6 @@ export const buildInitState = (config) => {
   } else {
     initDestinationChain = initDestinationChainOptions[0];
   }
-
   const initSenderAssetTypeOptions = getSenderAssetTypeOptions(
     config, initOriginChain, initDestinationChain
   );

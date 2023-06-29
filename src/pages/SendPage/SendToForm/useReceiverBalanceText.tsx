@@ -24,7 +24,7 @@ const useReceiverBalanceText = () => {
     apiIsDisconnected,
     receiverIsPrivate(),
     isInitialSync.current,
-    isReady
+    usingMantaWallet
   );
 
   const mantaSignerLoader =

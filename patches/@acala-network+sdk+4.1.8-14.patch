@@ -1,0 +1,32 @@
+diff --git a/node_modules/@acala-network/sdk/wallet/balance-adapter/erc20-adapter.js b/node_modules/@acala-network/sdk/wallet/balance-adapter/erc20-adapter.js
+index 9377f3a..61ed0df 100644
+--- a/node_modules/@acala-network/sdk/wallet/balance-adapter/erc20-adapter.js
++++ b/node_modules/@acala-network/sdk/wallet/balance-adapter/erc20-adapter.js
+@@ -31,12 +31,12 @@ class ERC20Adapter {
+     return evmAddress.isEmpty ? (0, _utils.computeDefaultEvmAddress)(address) : evmAddress.toString();
+   }
+   subscribeBalance(token, address) {
+-    var _this$caches;
++    // var _this$caches;
+     if (!token.isERC20) throw new _errors.NotERC20TokenName(token.name);
+     const cacheKey = `${token.name}-${address}`;
+ 
+     // hit caches
+-    if ((_this$caches = this.caches) !== null && _this$caches !== void 0 && _this$caches[cacheKey]) return this.caches[cacheKey];
++    // if ((_this$caches = this.caches) !== null && _this$caches !== void 0 && _this$caches[cacheKey]) return this.caches[cacheKey];
+     const tokenAddress = (0, _sdkCore.getERC20TokenAddressFromName)(token.name);
+     const contract = this.getERC20Contract(tokenAddress);
+     const balance$ = new _rxjs.Subject();
+diff --git a/node_modules/@acala-network/sdk/wallet/wallet.js b/node_modules/@acala-network/sdk/wallet/wallet.js
+index 63fb13a..28c5afb 100644
+--- a/node_modules/@acala-network/sdk/wallet/wallet.js
++++ b/node_modules/@acala-network/sdk/wallet/wallet.js
+@@ -49,7 +49,7 @@ class Wallet {
+     this.subscribeToken = (0, _util.memoize)(target => {
+       return this.tokenProvider.subscribeToken(target);
+     });
+-    this.subscribeBalance = (0, _util.memoize)((symbol, address) => {
++    this.subscribeBalance = ((symbol, address) => {
+       const token = this.tokenProvider.getToken(symbol);
+       return this.balanceAdapter.subscribeBalance(token, address);
+     });

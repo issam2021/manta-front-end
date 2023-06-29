@@ -8,10 +8,14 @@ import PrivateAssetItem from './PrivateAssetItem';
 const PrivateAssetTableContent = () => {
   const { balances } = useZkAccountBalances();
   const { balancesAreStaleRef, isInitialSync } = usePrivateWallet();
-  if (balances?.length) {
+  const nonzeroBalances = balances?.filter(
+    (balance: ZkAccountBalance) => balance && !balance.privateBalance.isZero()
+  );
+
+  if (nonzeroBalances?.length) {
     return (
       <div className="divide-y divide-dashed divide-manta-gray-secondary">
-        {balances.map((balance: ZkAccountBalance) => (
+        {nonzeroBalances.map((balance: ZkAccountBalance) => (
           <PrivateAssetItem balance={balance} key={balance.assetType.assetId} />
         ))}
       </div>

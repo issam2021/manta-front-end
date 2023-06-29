@@ -8,23 +8,24 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import AssetType from 'types/AssetType';
 import Balance from 'types/Balance';
 import Usd from 'types/Usd';
+import { useActive } from 'hooks/useActive';
 import { useConfig } from './configContext';
 import { useGlobal } from './globalContexts';
-import { useActive } from 'hooks/useActive';
 
 const ZkAccountBalancesContext = createContext();
 
 export type ZkAccountBalance = {
   assetType: AssetType;
-  usdBalance: Usd;
+  usdBalance: Usd | null;
   usdBalanceString: string;
   privateBalance: Balance;
 };
 
 export const ZkAccountBalancesContextProvider = (props) => {
   const config = useConfig();
-  const { privateAddress, getSpendableBalance, isReady } = usePrivateWallet();
+  const { privateWallet, privateAddress, getSpendableBalance, isReady } = usePrivateWallet();
   const { usdPrices } = useUsdPrices();
+  const { NETWORK_NAME: network } = useConfig();
 
   const assets = AssetType.AllCurrencies(config, true);
   const [totalBalanceString, setTotalBalanceString] = useState('$0.00');
@@ -32,7 +33,15 @@ export const ZkAccountBalancesContextProvider = (props) => {
   const { usingMantaWallet } = useGlobal();
   const isActive = useActive();
 
-  const fetchPrivateBalance = async (assetType) => {
+  useEffect(() => {
+    const clearBalancesOnSwitchMode = () => {
+      setBalances([]);
+      setTotalBalanceString('$0.00');
+    };
+    clearBalancesOnSwitchMode();
+  }, [usingMantaWallet]);
+
+  const fetchPrivateBalanceMantaSigner = async (assetType) => {
     let usdBalance = null;
     const privateBalance = await getSpendableBalance(assetType);
     if (privateBalance) {
@@ -58,27 +67,48 @@ export const ZkAccountBalancesContextProvider = (props) => {
     };
   };
 
-  const fetchPrivateBalances = async () => {
+  const fetchPrivateBalancesMantaWallet = async () => {
+    const assets = AssetType.AllCurrencies(config, true);
+    const assetIds = assets.map(asset => asset.assetId.toString());
+    const balancesRaw = await privateWallet.getMultiZkBalance({assetIds: assetIds, network });
+    const balances = [];
+    for (let i = 0; i < balancesRaw.length; i++) {
+      const balance = new Balance(assets[i], new BN(balancesRaw[i]));
+      const zkAccountBalance = {
+        assetType: assets[i],
+        usdBalance: null,
+        usdBalanceString: '',
+        privateBalance: balance
+      };
+      balances.push(zkAccountBalance);
+    }
+    setBalances(balances);
+    // Not tracked in Manta Wallet mode
+    setTotalBalanceString('$0.00');
+  };
+
+  const fetchPrivateBalancesMantaSigner = async () => {
     const totalUsd = new Usd(new Decimal(0));
     const updatedBalances = [];
     for (let i = 0; i < assets.length; i++) {
-      const balance = await fetchPrivateBalance(assets[i]);
+      const balance = await fetchPrivateBalanceMantaSigner(assets[i]);
       updatedBalances.push(balance);
       balance?.usdBalance?.value && totalUsd.add(balance.usdBalance);
     }
-    const nonzeroBalances = [
-      ...updatedBalances.filter(
-        (balance) =>
-          balance.privateBalance &&
-          balance.privateBalance.gt(new Balance(balance.assetType, new BN(0)))
-      )
-    ];
-    setBalances(nonzeroBalances);
+    setBalances(updatedBalances);
     setTotalBalanceString(totalUsd.toString());
   };
 
+  const fetchPrivateBalances = async () => {
+    if (usingMantaWallet) {
+      fetchPrivateBalancesMantaWallet();
+    } else {
+      fetchPrivateBalancesMantaSigner();
+    }
+  };
+
   useEffect(() => {
-    // Manta Signer
+    // When using manta wallet, balances are only fetched on demand to reduce load on the extension
     if (!usingMantaWallet) {
       const interval = setInterval(() => {
         if (isActive && isReady && privateAddress) {
@@ -87,7 +117,7 @@ export const ZkAccountBalancesContextProvider = (props) => {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isReady, privateAddress]);
+  }, [isReady, privateAddress, usingMantaWallet]);
 
   useEffect(() => {
     const clearBalancesOnDeleteZkAccount = () => {
@@ -101,7 +131,8 @@ export const ZkAccountBalancesContextProvider = (props) => {
 
   const value = {
     balances,
-    totalBalanceString
+    totalBalanceString,
+    fetchPrivateBalances
   };
 
   return (

@@ -68,8 +68,9 @@ const ValidationSendButton = ({ showModal }) => {
     receiverAddress,
     userCanPayFee,
     userHasSufficientFunds,
-    receiverAssetType,
+    isValidToSend,
     receiverAmountIsOverExistentialBalance,
+    senderAssetType,
     senderAssetTargetBalance,
     senderNativeTokenPublicBalance
   } = useSend();
@@ -149,8 +150,8 @@ const ValidationSendButton = ({ showModal }) => {
     }`;
   } else if (receiverAmountIsOverExistentialBalance() === false) {
     const existentialDeposit = new Balance(
-      receiverAssetType,
-      receiverAssetType.existentialDeposit
+      senderAssetType,
+      senderAssetType.existentialDeposit
     );
     validationMsg = `Min transaction is ${existentialDeposit.toDisplayString(
       3,
@@ -198,7 +199,8 @@ const ValidationSendButton = ({ showModal }) => {
           <button
             onClick={() => showModal()}
             className={classNames(
-              'gradient-button py-2 unselectable-text text-center text-white rounded-lg w-full'
+              'gradient-button py-2 unselectable-text text-center text-white rounded-lg w-full',
+              {'filter brightness-50 cursor-not-allowed': !isValidToSend()}
             )}>
             Connect Wallet and Signer
           </button>

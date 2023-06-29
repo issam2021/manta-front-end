@@ -143,3 +143,8 @@
     line-height: 16px !important;
     width: unset !important;
 }
+
+body ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.0) !important;
+    border-radius: 0;
+}

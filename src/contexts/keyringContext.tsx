@@ -26,6 +26,8 @@ import {
   setLastAccessedWallet
 } from 'utils/persistence/walletStorage';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
+import isObjectEmpty from 'utils/validation/isEmpty';
+import { useActive } from 'hooks/useActive';
 
 type KeyringContextValue = {
   keyring: Keyring;
@@ -83,6 +85,8 @@ export const KeyringContextProvider = ({
   const resetWalletConnectingErrorMessages = useCallback(() => {
     setWalletConnectingErrorMessages(getInitialWalletConnectingErrorMessages());
   }, []);
+
+  const isActive = useActive();
 
   const addWalletName = (walletName: string, walletNameList: string[]) => {
     const copyWalletNameList = [...walletNameList];
@@ -244,18 +248,15 @@ export const KeyringContextProvider = ({
   };
 
   useEffect(() => {
-    let unsub: any = null;
-    async function subAccounts() {
-      if (!selectedWallet?.subscribeAccounts) {
-        return;
-      }
-      unsub = await selectedWallet.subscribeAccounts(() => {
-        refreshWalletAccounts(selectedWallet);
-      });
-    }
-    subAccounts().catch(console.error);
-    return () => unsub && unsub();
-  }, [selectedWallet]);
+    // if not adding keyringAddresses as a dep, interval refreshWalletAccounts() is always using old keyringAddresses value
+    const hasSelectedWallet = !isObjectEmpty(selectedWallet);
+    const interval = setInterval(async () => {
+      isActive && hasSelectedWallet && refreshWalletAccounts(selectedWallet);
+    }, 1000);
+    return () => {
+      interval && clearInterval(interval);
+    };
+  }, [selectedWallet, keyringAddresses]);
 
   const initKeyring = useCallback(async () => {
     if (!isKeyringInit && web3ExtensionInjected.length !== 0) {

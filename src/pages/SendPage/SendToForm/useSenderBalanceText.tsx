@@ -20,7 +20,7 @@ const useSenderBalanceText = () => {
     apiIsDisconnected,
     senderIsPrivate(),
     isInitialSync.current,
-    isReady
+    usingMantaWallet
   );
 
   const shouldShowPublicLoader = Boolean(

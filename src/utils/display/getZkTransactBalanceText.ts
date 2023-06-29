@@ -5,11 +5,11 @@ const getZkTransactBalanceText = (
   apiIsDisconnected: boolean,
   isPrivate: boolean,
   isInitialSync: boolean,
-  isReady: boolean,
+  isMantaWallet: boolean
 ) => {
   if (apiIsDisconnected) {
     return 'Connecting to network';
-  } else if (isInitialSync && isPrivate && isReady) {
+  } else if (isInitialSync && isPrivate && !isMantaWallet) {
     return 'Syncing zk account';
   } else if (balance) {
     return `Balance: ${balance.toString()}`;

@@ -15,5 +15,6 @@
     "KUSAMA_SOCKET": "wss://ws.internal.kusama.systems",
     "KARURA_SOCKET": "wss://ws.archive.acala.seabird.systems",
     "MOONRIVER_SOCKET": "wss://ws.moonriver.seabird.systems",
+    "STATEMINE_SOCKET": "wss://c1.statemine.seabird.systems",
     "MOONRIVER_RPC": "https://c2.moonriver.seabird.systems/rpc"
 }

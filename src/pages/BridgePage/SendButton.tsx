@@ -139,7 +139,7 @@ const SwitchNetworkButton = () => {
 };
 
 const SendButton = () => {
-  const { send } = useBridgeTx();
+  const { send, isValidToSend } = useBridgeTx();
 
   const onClick = () => {
     send();
@@ -150,7 +150,8 @@ const SendButton = () => {
       onClick={onClick}
       className={classNames(
         'bg-connect-wallet-button py-2 unselectable-text cursor-pointer',
-        'text-center text-white rounded-lg w-full'
+        'text-center text-white rounded-lg w-full',
+        {'filter brightness-50 cursor-not-allowed': !isValidToSend()}
       )}>
       Submit
     </button>

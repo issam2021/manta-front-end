@@ -1,14 +1,15 @@
 // @ts-nocheck
 import { FixedPointNumber } from '@acala-network/sdk-core';
-import { useConfig } from 'contexts/configContext';
-import { useMetamask } from 'contexts/metamaskContext';
 import { usePublicAccount } from 'contexts/publicAccountContext';
 import { useTxStatus } from 'contexts/txStatusContext';
-import { transferMovrFromMoonriverToCalamari } from 'eth/EthXCM';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import TxStatus from 'types/TxStatus';
 import extrinsicWasSentByUser from 'utils/api/ExtrinsicWasSendByUser';
+import { useMetamask } from 'contexts/metamaskContext';
+import { transferMovrFromMoonriverToCalamari } from 'eth/EthXCM';
+import { useConfig } from 'contexts/configContext';
+import Balance from 'types/Balance';
 import { useBridgeData } from './BridgeDataContext';
 
 const BridgeTxContext = React.createContext();
@@ -42,13 +43,20 @@ export const BridgeTxContextProvider = (props) => {
    */
 
   const userCanPayOriginFee = () => {
-    if (!senderNativeAssetCurrentBalance || !originFee || !senderAssetTargetBalance) {
+    if (!senderNativeAssetCurrentBalance || !senderAssetTargetBalance || !originChain || !originFee) {
       return null;
     } else if (senderNativeAssetCurrentBalance.assetType.assetId !== originFee.assetType.assetId) {
       return null;
-    } else {
-      return senderNativeAssetCurrentBalance.gte(originFee);
     }
+
+    const nativeAsset = originChain.nativeAsset;
+    let txNativeTokenCost = originFee;
+    if (senderAssetTargetBalance?.assetType.assetId === nativeAsset.assetId) {
+      txNativeTokenCost = txNativeTokenCost.add(senderAssetTargetBalance);
+    }
+    const reservedNativeBalance =  new Balance(nativeAsset, nativeAsset.existentialDeposit);
+    const minBalanceToPayOriginFee = txNativeTokenCost.add(reservedNativeBalance);
+    return senderNativeAssetCurrentBalance.gte(minBalanceToPayOriginFee);
   };
 
   // Checks if the user has enough funds to pay for a transaction

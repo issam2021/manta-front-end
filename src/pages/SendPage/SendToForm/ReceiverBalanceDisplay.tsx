@@ -4,6 +4,7 @@ import Icon from 'components/Icon';
 import { useSend } from '../SendContext';
 import useReceiverBalanceText from './useReceiverBalanceText';
 
+
 const ReceiverBalanceDisplay = () => {
   const {
     receiverAssetType,

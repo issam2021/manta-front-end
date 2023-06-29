@@ -79,6 +79,7 @@ export const MantaWalletContextProvider = ({
   const [privateWallet, setPrivateWallet] = useState<PrivateWallet | null>(
     null
   );
+
   const [isReady, setIsReady] = useState<boolean>(false);
   const signerIsConnected = !!privateWallet?.getZkBalance;
 

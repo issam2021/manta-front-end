@@ -1,5 +1,7 @@
 // @ts-nocheck
 import React, { useReducer, useContext, useEffect } from 'react';
+import { Wallet } from '@acala-network/sdk/wallet';
+import { EvmRpcProvider } from '@acala-network/eth-providers';
 import PropTypes from 'prop-types';
 import { usePublicAccount } from 'contexts/publicAccountContext';
 import Balance from 'types/Balance';
@@ -25,7 +27,6 @@ export const BridgeDataContextProvider = (props) => {
   const isActive = useActive();
 
   const [state, dispatch] = useReducer(bridgeReducer, buildInitState(config));
-
   const {
     isApiInitialized,
     senderAssetType,
@@ -101,13 +102,25 @@ export const BridgeDataContextProvider = (props) => {
         const api = chain.getXcmApi();
         api.on('connected', () => {
           handleApiConnect(chain);
-          // only runs on initial connection
           api.isReady.then(() => {
-            adapter.init(api);
-            dispatch({
-              type: BRIDGE_ACTIONS.SET_API_IS_INITIALIZED,
-              chain
-            });
+            if (chain.name === 'karura' || chain.name === 'acala') {
+              const socket = chain.name === 'karura' ? config.KARURA_SOCKET : config.ACALA_SOCKET;
+              const acalaConfigs = { evmProvider: new EvmRpcProvider(socket) };
+              const wallet = new Wallet(api, acalaConfigs);
+              wallet.isReady.then(async () => {
+                await adapter.init(api, wallet);
+                dispatch({
+                  type: BRIDGE_ACTIONS.SET_API_IS_INITIALIZED,
+                  chain
+                });
+              });
+            } else {
+              adapter.init(api);
+              dispatch({
+                type: BRIDGE_ACTIONS.SET_API_IS_INITIALIZED,
+                chain
+              });
+            }
           });
         });
         api.on('error', () => handleApiDisconnect(chain));
@@ -116,7 +129,6 @@ export const BridgeDataContextProvider = (props) => {
     };
     initBridgeApis();
   }, [bridge, originChainOptions]);
-
 
   /**
    *
@@ -154,53 +166,74 @@ export const BridgeDataContextProvider = (props) => {
     setDestinationAddressOnChangeExternalAccount();
   }, [externalAccount]);
 
-
   /**
    *
    * Subscriptions
    *
    */
 
-  const fetchBalance = async (assetType, address) => {
+  const waitForTxFinished = async () => {
+    while (txStatusRef.current?.isProcessing()) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  };
+
+  const subscribeSenderBalance = () => {
     const balanceObserveable = originXcmAdapter.subscribeTokenBalance(
-      assetType.logicalTicker, address
+      senderAssetType.logicalTicker, originAddress
     );
-    const balance = await firstValueFrom(balanceObserveable);
-    return Balance.fromBaseUnits(assetType, balance.free);
+    const unsub = balanceObserveable.subscribe(async (balanceRaw) => {
+      const newBalance = Balance.fromBaseUnits(senderAssetType, balanceRaw.free);
+      if (senderAssetCurrentBalance && newBalance.eq(senderAssetCurrentBalance)) {
+        return;
+      }
+      await waitForTxFinished();
+      dispatch({
+        type: BRIDGE_ACTIONS.SET_SENDER_ASSET_CURRENT_BALANCE,
+        senderAssetCurrentBalance: newBalance
+      });
+    });
+    return unsub;
   };
 
-  const fetchSenderNativeTokenBalance = async () => {
-    const senderNativeAssetCurrentBalance = await fetchBalance(
-      originChain.nativeAsset,
-      originAddress
+  const subscribeSenderNativeTokenBalance = () => {
+    const balanceObserveable = originXcmAdapter.subscribeTokenBalance(
+      originChain.nativeAsset.logicalTicker, originAddress
     );
-    dispatch({
-      type: BRIDGE_ACTIONS.SET_SENDER_NATIVE_ASSET_CURRENT_BALANCE,
-      senderNativeAssetCurrentBalance
+    const unsub = balanceObserveable.subscribe((balanceRaw) => {
+      const senderNativeAssetCurrentBalance = Balance.fromBaseUnits(originChain.nativeAsset, balanceRaw.free);
+      dispatch({
+        type: BRIDGE_ACTIONS.SET_SENDER_NATIVE_ASSET_CURRENT_BALANCE,
+        senderNativeAssetCurrentBalance
+      });
     });
-  };
-
-  const fetchSenderBalance = async () => {
-    const senderAssetCurrentBalance = await fetchBalance(
-      senderAssetType,
-      originAddress
-    );
-    dispatch({
-      type: BRIDGE_ACTIONS.SET_SENDER_ASSET_CURRENT_BALANCE,
-      senderAssetCurrentBalance
-    });
+    return unsub;
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isActive || txStatus?.isProcessing() || !isApiInitialized) {
+    let nativeTokenUnsub = null;
+    let senderBalanceUnsub = null;
+    const subscribeBalances = async () => {
+      if (
+        !senderAssetType
+        || !originAddress
+        || !isApiInitialized
+        || !originChain
+        || !isActive
+      ) {
         return;
       }
-      fetchSenderBalance();
-      fetchSenderNativeTokenBalance();
-    }, 1000);
-    return () => clearInterval(interval);
+      nativeTokenUnsub = subscribeSenderNativeTokenBalance();
+      senderBalanceUnsub = subscribeSenderBalance();
+    };
+    subscribeBalances();
+    return () => {
+      nativeTokenUnsub?.unsubscribe();
+      senderBalanceUnsub?.unsubscribe();
+    };
   }, [
+    isActive,
+    originXcmAdapter,
     senderAssetType,
     externalAccount,
     originAddress,
@@ -210,7 +243,6 @@ export const BridgeDataContextProvider = (props) => {
     destinationChain,
     txStatus
   ]);
-
 
   useEffect(() => {
     const getDestinationFee = (inputConfig) => {
@@ -270,7 +302,8 @@ export const BridgeDataContextProvider = (props) => {
 
     const subscribeInputConfig = async () => {
       if (
-        !senderAssetType
+        !isActive
+        || !senderAssetType
         || !originAddress
         || !isApiInitialized
         || !originChain
@@ -279,7 +312,7 @@ export const BridgeDataContextProvider = (props) => {
         return;
       }
       // Workaround for Karura adapter internals not being ready on initial connection
-      originChain.name === 'karura' && await originXcmAdapter.wallet.isReady;
+      (originChain.name === 'karura' || originChain.name === 'acala') && await originXcmAdapter.wallet.isReady;
       const inputConfigParams = getInputConfigParams();
       const inputConfigObservable = originXcmAdapter.subscribeInputConfig(inputConfigParams);
       const inputConfig = await firstValueFrom(inputConfigObservable);
@@ -287,7 +320,7 @@ export const BridgeDataContextProvider = (props) => {
     };
     subscribeInputConfig();
   },[
-    senderAssetType, senderAssetCurrentBalance, senderAssetTargetBalance,
+    isActive, senderAssetType, senderAssetCurrentBalance, senderAssetTargetBalance,
     originAddress, destinationAddress, originChain, destinationChain, isApiInitialized
   ]);
 

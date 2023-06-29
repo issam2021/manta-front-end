@@ -4,13 +4,16 @@ import { useMantaWallet } from 'contexts/mantaWalletContext';
 import Version from 'types/Version';
 import { Balance } from '@polkadot/types/interfaces';
 import { useGlobal } from './globalContexts';
+import { PrivateWallet } from './mantaWalletType';
 
 type MantaWalletExclusiveProperties = {
+  privateWallet: PrivateWallet | null
   mantaWalletVersion: Version | null;
   hasFinishedInitialBlockDownload: boolean | null;
 }
 
 const dummyMantaWalletExclusiveProperties: MantaWalletExclusiveProperties = {
+  privateWallet: null,
   mantaWalletVersion: null,
   hasFinishedInitialBlockDownload: null
 };
@@ -30,6 +33,7 @@ const dummyMantaSignerExclusiveProperties: MantaSignerExclusiveProperties = {
 };
 
 type PrivateWalletContextValue = {
+  privateWallet: PrivateWallet | null
   signerVersion: Version | null;
   mantaWalletVersion: Version | null;
   isReady: boolean;

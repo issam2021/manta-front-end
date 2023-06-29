@@ -7,7 +7,7 @@ import AssetType from 'types/AssetType';
 import classNames from 'classnames';
 import Icon from 'components/Icon';
 
-const AssetTypeSelect = ({
+const AssetTypeSelectDropdown = ({
   assetType,
   assetTypeOptions,
   setSelectedAssetType
@@ -53,7 +53,7 @@ const AssetTypeSelect = ({
   );
 };
 
-AssetTypeSelect.propTypes = {
+AssetTypeSelectDropdown.propTypes = {
   selectedOption: PropTypes.instanceOf(AssetType),
   setSelectedOption: PropTypes.func,
   optionsArePrivate: PropTypes.bool
@@ -153,4 +153,4 @@ const AssetTypeMenuList = (props) => {
   );
 };
 
-export default AssetTypeSelect;
+export default AssetTypeSelectDropdown;

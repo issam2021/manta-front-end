@@ -9,11 +9,13 @@
     "KUSAMA_SUBSCAN_URL": "https://kusama.subscan.io",
     "KARURA_SUBSCAN_URL": "https://karura.subscan.io",
     "MOONRIVER_SUBSCAN_URL": "https://moonriver.subscan.io",
+    "STATEMINE_SUBSCAN_URL": "https://statemine.subscan.io",
     "TWITTER_URL": "https://twitter.com/CalamariNetwork",
     "CALAMARI_URL": "https://calamari.network/",
     "CALAMARI_SOCKET": "wss://calamari.systems",
     "KUSAMA_SOCKET": "wss://kusama-rpc.polkadot.io",
-    "KARURA_SOCKET": "wss://karura-rpc-0.aca-api.network",
+    "KARURA_SOCKET": "wss://karura-rpc-1.aca-api.network",
     "MOONRIVER_SOCKET": "wss://wss.api.moonriver.moonbeam.network",
+    "STATEMINE_SOCKET": "wss://statemine-rpc.polkadot.io",
     "MOONRIVER_RPC": "https://rpc.moonriver.moonbeam.network"
 }

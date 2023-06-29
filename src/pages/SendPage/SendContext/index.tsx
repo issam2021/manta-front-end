@@ -1,7 +1,7 @@
 // @ts-nocheck
+import NETWORK from 'constants/NetworkConstants';
 import { bnToU8a } from '@polkadot/util';
 import BN from 'bn.js';
-import NETWORK from 'constants/NetworkConstants';
 import { useConfig } from 'contexts/configContext';
 import { useGlobal } from 'contexts/globalContexts';
 import { usePrivateWallet } from 'contexts/privateWalletContext';
@@ -10,7 +10,7 @@ import { useSubstrate } from 'contexts/substrateContext';
 import { useTxStatus } from 'contexts/txStatusContext';
 import { useActive } from 'hooks/useActive';
 import PropTypes from 'prop-types';
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import AssetType from 'types/AssetType';
 import Balance from 'types/Balance';
 import { HISTORY_EVENT_STATUS } from 'types/TxHistoryEvent';
@@ -36,6 +36,7 @@ export const SendContextProvider = (props) => {
   } = privateWallet;
   const [state, dispatch] = useReducer(sendReducer, buildInitState(config));
   const isActive = useActive();
+  const [publicBalances, setPublicBalances] = useState(null);
   const {
     senderAssetType,
     senderAssetCurrentBalance,
@@ -229,6 +230,20 @@ export const SendContextProvider = (props) => {
     }
   };
 
+  const fetchPublicBalances = async () => {
+    const balances = [];
+    const assetTypes = AssetType.AllCurrencies(config, false);
+    for (const assetType of assetTypes) {
+      const balance = await fetchPublicBalance(senderPublicAccount?.address, assetType);
+      balance && balances.push(balance);
+    }
+    setPublicBalances(balances);
+  };
+
+  useEffect(() => {
+    fetchPublicBalances();
+  }, [senderPublicAccount, txStatus, api?.isConnected]);
+
   // Gets available native public balance for some public address;
   // This is currently a special case because querying native token balnces
   // requires a different api call
@@ -363,6 +378,9 @@ export const SendContextProvider = (props) => {
         zeroBalance
       );
     }
+    if (senderAssetType.isPrivate) {
+      return senderAssetCurrentBalance;
+    }
     return senderAssetCurrentBalance.valueOverExistentialDeposit();
   };
 
@@ -466,6 +484,20 @@ export const SendContextProvider = (props) => {
 
   // Checks that it is valid to attempt a transaction
   const isValidToSend = () => {
+    // Debug logging for issue #1005 ("Sometimes when I click 'To Private', there is no response")
+    // Committed intentionally, but should be removed after issue is resolved
+    console.log('isValidToSend', {
+      privateWalletIsReady: privateWallet?.isReady,
+      isPublicTransfer: isPublicTransfer(),
+      api,
+      externalAccountSigner,
+      receiverAddress,
+      senderAssetTargetBalance,
+      senderAssetCurrentBalance,
+      userHasSufficientFunds: userHasSufficientFunds(),
+      userCanPayFee: userCanPayFee(),
+      receiverAmountIsOverExistentialBalance: receiverAmountIsOverExistentialBalance()
+    });
     return (
       (privateWallet?.isReady || isPublicTransfer()) &&
       api &&
@@ -676,6 +708,8 @@ export const SendContextProvider = (props) => {
     senderIsPrivate,
     receiverIsPrivate,
     senderIsPublic,
+    publicBalances,
+    fetchPublicBalances,
     ...state
   };
 
