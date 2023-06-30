@@ -50,6 +50,7 @@ module.exports = {
         68: '272px',
         108: '432px',
         118: '472px',
+        120: '480px',
         126.5: '506px',
         140: '560px',
         156: '625px'
@@ -101,7 +102,10 @@ module.exports = {
         warning: '#FF8A00',
         'green-light': '#29CCB9',
         banner: '#050D32',
-        'modal-btn': '#1B65F6'
+        'modal-btn': '#1B65F6',
+        link2: '#51FFE0',
+        gray: '#D9D9D999',
+        'light-yellow': '#FCCF8699'
       },
       fill: {
         current: 'var(--color-text-secondary)',

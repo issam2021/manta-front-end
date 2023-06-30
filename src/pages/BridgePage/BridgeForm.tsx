@@ -11,6 +11,7 @@ import { useBridgeData } from './BridgeContext/BridgeDataContext';
 import BridgeAssetSelect from './BridgeAssetSelect';
 import BridgeFeeDisplay from './BridgeFeeDisplay';
 import BridgeDestinationForm from './BridgeDestinationForm';
+import AssociatedBridges from './AssociatedBridges';
 
 const BridgeForm = () => {
   const config = useConfig();
@@ -76,6 +77,7 @@ const BridgeForm = () => {
         <BridgeFeeDisplay />
         <SendButton />
       </div>
+      <AssociatedBridges />
     </div>
   );
 };
