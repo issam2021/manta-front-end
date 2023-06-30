@@ -3,7 +3,7 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
 function AssociatedBridges() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const toggleStatus = () => {
     setOpen((prev) => !prev);
   };

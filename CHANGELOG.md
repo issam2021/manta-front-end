@@ -351,4 +351,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [6.2.0] - 2023-6-27
 
 ### Added
+
 - [\#981](https://github.com/Manta-Network/manta-front-end/pull/981) Enable privatization and bridging for USDC, USDT, and DAI
+
+## [6.2.1] - 2023-6-30
+
+### Added
+
+- [\#1142](https://github.com/Manta-Network/manta-front-end/pull/1142) Add associated bridges
