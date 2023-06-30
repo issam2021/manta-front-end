@@ -10,7 +10,7 @@ function AssociatedBridges() {
   const Content = () => {
     return (
       <div className="-mt-2">
-        <div className="text-gray leading-4 text-xss mb-2">
+        <div className="text-gray2 leading-4 text-xss mb-2">
           To move assets from other chains to Calamari Network, first bridge
           those assets to Karura, and then transfer them using the Manta Bridge.
         </div>
@@ -21,7 +21,7 @@ function AssociatedBridges() {
           rel="noreferrer">
           Karura Bridge
         </a>
-        <div className="text-gray leading-4 text-xss mt-2 mb-4">
+        <div className="text-gray2 leading-4 text-xss mt-2 mb-4">
           Karura Bridge enables smooth asset transfers between Kusama parachains
           and Ethereum. Calamari supports the following assets from Karura
           Bridge:{' '}

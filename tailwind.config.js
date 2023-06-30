@@ -104,7 +104,7 @@ module.exports = {
         banner: '#050D32',
         'modal-btn': '#1B65F6',
         link2: '#51FFE0',
-        gray: '#D9D9D999',
+        gray2: '#D9D9D999',
         'light-yellow': '#FCCF8699'
       },
       fill: {
