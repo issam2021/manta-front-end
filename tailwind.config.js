@@ -59,7 +59,9 @@ module.exports = {
         5.5: '22px'
       },
       backgroundImage: {
-        'giant-squid': 'var(--giantsquid-navbar-bg)'
+        'giant-squid': 'var(--giantsquid-navbar-bg)',
+        'trading-whitelist-banner': 'var(--whitelist-navbar-bg)',
+        'trading-stablecoin-banner': 'var(--stablecoin-navbar-bg)',
       },
       backgroundColor: {
         primary: 'var(--color-bg-primary)',

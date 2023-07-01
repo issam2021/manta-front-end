@@ -54,6 +54,8 @@ svg {
     #00afa5 103.69%
   );
   --giantsquid-navbar-bg: linear-gradient(90deg, #eb559f 0%, #f3ab82 100%);
+  --whitelist-navbar-bg: linear-gradient(90deg, #ff8049 0%, #fc51ff 100%);
+  --stablecoin-navbar-bg: linear-gradient(90deg, #0058db 0%, #07bda7 100%);
 }
 
 .light {
@@ -91,6 +93,8 @@ svg {
     #00afa5 103.69%
   );
   --giantsquid-navbar-bg: linear-gradient(90deg, #eb559f 0%, #f3ab82 100%);
+  --whitelist-navbar-bg: linear-gradient(90deg, #ff8049 0%, #fc51ff 100%);
+  --stablecoin-navbar-bg: linear-gradient(90deg, #0058db 0%, #07bda7 100%);
 }
 
 .custom-colors {
