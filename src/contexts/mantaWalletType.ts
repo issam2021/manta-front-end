@@ -2,7 +2,7 @@
 import type { Unsubcall } from '@polkadot/extension-inject/types';
 import type { HexString } from '@polkadot/util/types';
 
-export type Network = string;
+export type Network = 'Dolphin' | 'Calamari' | 'Manta';
 export interface PrivateWalletStateInfo {
   isWalletInitialized: boolean;
   isWalletAuthorized: boolean;
@@ -39,6 +39,18 @@ export type RequestMatchPrivateTransaction = {
   extrinsicHash: string
   method: string
 }
+export type PrivateTransactionType = 'publicToPrivate' | 'privateToPrivate' | 'privateToPublic';
+export interface EstimateTransactionPayload {
+  transactionType: PrivateTransactionType
+  assetId: string
+  amount: string
+  zkAddressOrPolkadotAddress?: string
+}
+
+export interface RequestEstimateTransactionPayload
+  extends EstimateTransactionPayload {
+  network: Network
+}
 
 export type PrivateWallet = {
   getWalletState(): Promise<PrivateWalletStateInfo>;
@@ -56,4 +68,7 @@ export type PrivateWallet = {
     cb: (state: PrivateWalletStateInfo) => void | Promise<void>
   ) => Unsubcall;
   matchPrivateTransaction: (payload: RequestMatchPrivateTransaction) => void;
+  estimateTransferPostsCount(
+    payload: RequestEstimateTransactionPayload,
+  ): Promise<number>
 };

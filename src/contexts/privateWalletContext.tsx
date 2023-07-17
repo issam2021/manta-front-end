@@ -4,18 +4,20 @@ import { useMantaWallet } from 'contexts/mantaWalletContext';
 import Version from 'types/Version';
 import { Balance } from '@polkadot/types/interfaces';
 import { useGlobal } from './globalContexts';
-import { PrivateWallet } from './mantaWalletType';
+import { PrivateTransactionType, PrivateWallet } from './mantaWalletType';
 
 type MantaWalletExclusiveProperties = {
   privateWallet: PrivateWallet | null
   mantaWalletVersion: Version | null;
   hasFinishedInitialBlockDownload: boolean | null;
+  estimateTransactionBatchCount: (_: Balance, ___: PrivateTransactionType) => Promise<number | null>;
 }
 
 const dummyMantaWalletExclusiveProperties: MantaWalletExclusiveProperties = {
   privateWallet: null,
   mantaWalletVersion: null,
-  hasFinishedInitialBlockDownload: null
+  hasFinishedInitialBlockDownload: null,
+  estimateTransactionBatchCount: (_: Balance, ___: PrivateTransactionType) => {return Promise.resolve(1);}
 };
 
 type MantaSignerExclusiveProperties = {
@@ -48,6 +50,7 @@ type PrivateWalletContextValue = {
   balancesAreStale: boolean,
   balancesAreStaleRef: React.MutableRefObject<boolean>
   hasFinishedInitialBlockDownload: boolean | null;
+  estimateTransactionBatchCount: (_: Balance, ___: PrivateTransactionType) => Promise<number | null>;
 };
 
 const PrivateWalletContext = createContext<PrivateWalletContextValue | null>(null);
@@ -91,6 +94,7 @@ export const PrivateWalletContextProvider = ({
       mantaWalletValue?.sync,
       mantaWalletValue?.isInitialSync,
       mantaWalletValue?.signerIsConnected,
+      mantaWalletValue?.estimateTransactionBatchCount
     ]
   );
 

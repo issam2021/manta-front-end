@@ -6,6 +6,7 @@ import SendButton from '../SendButton';
 import { useSend } from '../SendContext';
 import ZkTransactGuideModal from '../ZkTransactGuideModal/ZkTransactGuideModal';
 import SendToAddressForm from './SendToAddressForm';
+import FeeDisplay from './FeeDisplay';
 
 const SendToForm = () => {
   const { toggleReceiverIsPrivate, receiverAssetType } = useSend();
@@ -23,6 +24,7 @@ const SendToForm = () => {
           />
         </div>
         <SendToAddressForm />
+        <FeeDisplay />
       </div>
       <SendButton showModal={showModal} />
       <ModalWrapper>

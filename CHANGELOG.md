@@ -359,3 +359,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - [\#1142](https://github.com/Manta-Network/manta-front-end/pull/1142) Add associated bridges
+
+## [6.2.2] - 2023-7-17
+
+### Added
+
+- [\#1112](https://github.com/Manta-Network/manta-front-end/pull/1112) estimate private tx bacthes

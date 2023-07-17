@@ -39,6 +39,7 @@ export const MantaSignerWalletContextProvider = (props) => {
   const [privateAddress, setPrivateAddress] = useState(null);
   const [privateWallet, setPrivateWallet] = useState(null);
   const walletNetworkIsActive = useRef(false);
+
   useEffect(() => {
     walletNetworkIsActive.current = window.location.pathname.includes(
       config.NETWORK_NAME.toLowerCase()

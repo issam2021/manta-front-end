@@ -34,6 +34,8 @@ export const buildInitState = (config) => {
     receiverAssetType:initReceiverAssetType,
     receiverCurrentBalance: null,
     receiverAddress: null,
+
+    feeEstimate: null
   };
 };
 
@@ -71,6 +73,9 @@ const sendReducer = (state, action) => {
 
   case SEND_ACTIONS.SET_RECEIVER_CURRENT_BALANCE:
     return setReceiverCurrentBalance(state, action);
+
+  case SEND_ACTIONS.SET_FEE_ESTIMATE:
+    return setFeeEstimate(state, action);
 
   default:
     throw new Error(`Unknown type: ${action.type}`);
@@ -124,6 +129,7 @@ const toggleSenderIsPrivate = (state) => {
     senderAssetType,
     receiverAddress,
     senderAssetCurrentBalance: null,
+    feeEstimate: null
   };
 };
 
@@ -143,7 +149,8 @@ const toggleReceiverIsPrivate = (state) => {
     ...state,
     receiverAssetType,
     receiverAddress,
-    receiverCurrentBalance: null
+    receiverCurrentBalance: null,
+    feeEstimate: null
   };
 };
 
@@ -257,6 +264,18 @@ const setReceiverCurrentBalance = (state, action) => {
   return {
     ...state,
     receiverCurrentBalance: action.receiverCurrentBalance
+  };
+};
+
+const setFeeEstimate = (state, { feeEstimate, senderAssetType, receiverAssetType }) => {
+  if (balanceUpdateIsStale(state?.senderAssetType, senderAssetType)) {
+    return state;
+  } else if (balanceUpdateIsStale(state?.receiverAssetType, receiverAssetType)) {
+    return state;
+  }
+  return {
+    ...state,
+    feeEstimate
   };
 };
 
