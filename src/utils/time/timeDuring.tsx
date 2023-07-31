@@ -11,6 +11,9 @@ const incentiveAllowEndTimeStr = 'Jul 4 2023 1:00:00 UTC';
 const stableCoinStartTimeStr = 'Jun 29 2023 13:00:00 UTC';
 const stableCoinEndTimeStr = 'Jul 13 2023 13:00:00 UTC';
 
+const incentiveChapter3StartTimeStr = 'Jul 31 2023 13:00:00 UTC';
+const incentiveChapter3EndTimeStr = 'Aug 27 2023 13:00:00 UTC';
+
 export const getGiantSquidBannerIsActive = (): boolean => {
   return getTimeWindowIsActive(
     new Date(),
@@ -37,6 +40,13 @@ export const getStableCoinBannerIsActive = (): boolean => {
     new Date(),
     new Date(stableCoinStartTimeStr),
     new Date(stableCoinEndTimeStr)
+  );
+};
+export const getChapter3BannerIsActive = (): boolean => {
+  return getTimeWindowIsActive(
+    new Date(),
+    new Date(incentiveChapter3StartTimeStr),
+    new Date(incentiveChapter3EndTimeStr)
   );
 };
 export const getTimeWindowIsActive = (

@@ -2,7 +2,8 @@ import {
   getGiantSquidBannerIsActive,
   getTradingIncentiveBannerIsActive,
   getIncentiveAllowListBannerIsActive,
-  getStableCoinBannerIsActive
+  getStableCoinBannerIsActive,
+  getChapter3BannerIsActive
 } from 'utils/time/timeDuring';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper';
@@ -10,6 +11,7 @@ import GiantSquidBanner from './GiantSquidBanner';
 import TradingIncentiveBanner from './TradingIncentiveBanner';
 import IncentiveAllowListBanner from './IncentiveAllowListBanner';
 import StableCoinBanner from './StableCoinBanner';
+import IncentiveChapter3Banner from './IncentiveChapter3Banner';
 import 'swiper/swiper.scss';
 
 export interface IbannnerProps {
@@ -27,7 +29,8 @@ const ActivityBanner: React.FC<object> = () => {
     !getGiantSquidBannerIsActive() &&
     !getTradingIncentiveBannerIsActive() &&
     !getIncentiveAllowListBannerIsActive() &&
-    !getStableCoinBannerIsActive()
+    !getStableCoinBannerIsActive() &&
+    !getChapter3BannerIsActive()
   ) {
     return null;
   }
@@ -60,6 +63,11 @@ const ActivityBanner: React.FC<object> = () => {
         {getStableCoinBannerIsActive() && (
           <SwiperSlide>
             <StableCoinBanner className={whiteClass} />
+          </SwiperSlide>
+        )}
+        {getChapter3BannerIsActive() && (
+          <SwiperSlide>
+            <IncentiveChapter3Banner className={whiteClass} />
           </SwiperSlide>
         )}
       </Swiper>
