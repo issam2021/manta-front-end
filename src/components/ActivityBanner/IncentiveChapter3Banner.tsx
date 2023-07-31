@@ -2,9 +2,9 @@ import React from 'react';
 import Icon from 'components/Icon';
 import { IbannnerProps } from './index';
 
-const week2StartTimeStr = 'Aug 6 2023 13:00:00 UTC';
-const week3StartTimeStr = 'Aug 13 2023 13:00:00 UTC';
-const week4StartTimeStr = 'Aug 20 2023 13:00:00 UTC';
+const week2StartTimeStr = 'Aug 7 2023 13:00:00 UTC';
+const week3StartTimeStr = 'Aug 14 2023 13:00:00 UTC';
+const week4StartTimeStr = 'Aug 21 2023 13:00:00 UTC';
 
 enum ACTIVITY_URL {
   'WEEK1' = 'https://activity.manta.network/the-manta-shield/privatize-to-maximize-chapter3-1',
