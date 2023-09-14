@@ -7,6 +7,9 @@ import { useKeyring } from 'contexts/keyringContext';
 import { useConfig } from 'contexts/configContext';
 import classNames from 'classnames';
 import Icon from 'components/Icon';
+import DowntimeModal from 'components/Modal/downtimeModal';
+import MobileNotSupportedModal from 'components/Modal/mobileNotSupported';
+import userIsMobile from 'utils/ui/userIsMobile';
 import { useBridgeData } from './BridgeContext/BridgeDataContext';
 import BridgeAssetSelect from './BridgeAssetSelect';
 import BridgeFeeDisplay from './BridgeFeeDisplay';
@@ -42,10 +45,18 @@ const BridgeForm = () => {
     }
   };
 
+  let warningModal = <div />;
+  if (config.DOWNTIME) {
+    warningModal = <DowntimeModal />;
+  } else if (userIsMobile()) {
+    warningModal = <MobileNotSupportedModal />;
+  }
+
   const shouldShowDestinationForm = originChainIsEvm || destinationChainIsEvm;
 
   return (
     <div className="2xl:inset-x-0 justify-center min-h-full flex flex-col gap-6 items-center pb-2 pt-12">
+      {warningModal}
       <div className="flex flex-col px-3 py-4 sm:p-8 bg-secondary rounded-lg">
         <div className="flex gap-5 flex-row items-end mb-6">
           <ChainSelect
