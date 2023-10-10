@@ -1,5 +1,18 @@
+diff --git a/node_modules/@acala-network/sdk/wallet/balance-adapter/acala.js b/node_modules/@acala-network/sdk/wallet/balance-adapter/acala.js
+index 36f7fb1..4a2164a 100644
+--- a/node_modules/@acala-network/sdk/wallet/balance-adapter/acala.js
++++ b/node_modules/@acala-network/sdk/wallet/balance-adapter/acala.js
+@@ -44,7 +44,7 @@ class AcalaBalanceAdapter {
+     this.api = void 0;
+     this.transformNative = (data, token) => {
+       const free = _sdkCore.FixedPointNumber.fromInner(data.data.free.toString(), token.decimals);
+-      const locked = _sdkCore.FixedPointNumber.fromInner(data.data.miscFrozen.toString(), token.decimals).max(_sdkCore.FixedPointNumber.fromInner(data.data.feeFrozen.toString(), token.decimals));
++      const locked = _sdkCore.FixedPointNumber.fromInner(data.data.frozen.toString(), token.decimals);
+       const reserved = _sdkCore.FixedPointNumber.fromInner(data.data.reserved.toString(), token.decimals);
+       const available = free.sub(locked).max(_sdkCore.FixedPointNumber.ZERO);
+       return {
 diff --git a/node_modules/@acala-network/sdk/wallet/balance-adapter/erc20-adapter.js b/node_modules/@acala-network/sdk/wallet/balance-adapter/erc20-adapter.js
-index 9377f3a..61ed0df 100644
+index 9377f3a..d6d3279 100644
 --- a/node_modules/@acala-network/sdk/wallet/balance-adapter/erc20-adapter.js
 +++ b/node_modules/@acala-network/sdk/wallet/balance-adapter/erc20-adapter.js
 @@ -31,12 +31,12 @@ class ERC20Adapter {
@@ -18,7 +31,7 @@ index 9377f3a..61ed0df 100644
      const contract = this.getERC20Contract(tokenAddress);
      const balance$ = new _rxjs.Subject();
 diff --git a/node_modules/@acala-network/sdk/wallet/wallet.js b/node_modules/@acala-network/sdk/wallet/wallet.js
-index 63fb13a..28c5afb 100644
+index 63fb13a..083a545 100644
 --- a/node_modules/@acala-network/sdk/wallet/wallet.js
 +++ b/node_modules/@acala-network/sdk/wallet/wallet.js
 @@ -49,7 +49,7 @@ class Wallet {

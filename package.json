@@ -77,8 +77,8 @@
         "wasm-loader": "^1.3.0"
     },
     "scripts": {
-        "start": "craco start",
-        "build": "craco build",
+        "start": "craco --openssl-legacy-provider start",
+        "build": "craco --openssl-legacy-provider build",
         "test": "craco test",
         "lint": "npx eslint src/**/*.tsx",
         "eject": "react-scripts eject",
