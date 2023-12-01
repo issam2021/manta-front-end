@@ -235,9 +235,9 @@ export default class AssetType {
       return [
         AssetType.DolphinSkinnedCalamari(config, isPrivate),
         // AssetType.Karura(config, isPrivate),
-        AssetType.Kusama(config, isPrivate),
+        // AssetType.Kusama(config, isPrivate),
         AssetType.Moonriver(config, isPrivate),
-        AssetType.Tether(config, isPrivate),
+        // AssetType.Tether(config, isPrivate),
         // AssetType.WrappedBitcoin(config, isPrivate),
         // AssetType.WrappedEthereum(config, isPrivate),
         // AssetType.Dai(config, isPrivate),
@@ -247,7 +247,7 @@ export default class AssetType {
       return [
         AssetType.Calamari(config, isPrivate),
         AssetType.Karura(config, isPrivate),
-        AssetType.Kusama(config, isPrivate),
+        // AssetType.Kusama(config, isPrivate),
         AssetType.Moonriver(config, isPrivate),
         // AssetType.Tether(config, isPrivate),
         // AssetType.WrappedBitcoin(config, isPrivate),

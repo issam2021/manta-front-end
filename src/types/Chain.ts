@@ -169,7 +169,7 @@ export default class Chain {
     if (config.NETWORK_NAME === NETWORK.CALAMARI) {
       return [
         Chain.Calamari(config),
-        Chain.Kusama(config),
+        // Chain.Kusama(config),
         Chain.Karura(config),
         Chain.Moonriver(config),
         // Chain.Statemine(config)
@@ -177,7 +177,7 @@ export default class Chain {
     } else if (config.NETWORK_NAME === NETWORK.DOLPHIN) {
       return [
         Chain.DolphinSkinnedCalamari(config),
-        Chain.Kusama(config),
+        // Chain.Kusama(config),
         // Chain.Karura(config),
         Chain.Moonriver(config),
         // Chain.Statemine(config)
